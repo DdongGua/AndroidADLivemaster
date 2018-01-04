@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:navigationIcon="@mipmap/left_arraw"
+        app:title="编辑资料"
+        app:titleTextColor="@color/white"
+        />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+            <com.example.android_adlive_master.widget.EditProfileItem
+                android:id="@+id/ep_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemtitle="头像"
+                app:itemtype="avatar"
+                />
+
+            <com.example.android_adlive_master.widget.EditProfileItem
+                android:id="@+id/ep_nickname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemtitle="昵称"
+                />
+
+            <com.example.android_adlive_master.widget.EditProfileItem
+                android:id="@+id/ep_adouid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemtitle="阿斗号"
+                />
+
+            <com.example.android_adlive_master.widget.EditProfileItem
+                android:id="@+id/ep_gender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemtitle="性别"
+                />
+
+            <com.example.android_adlive_master.widget.EditProfileItem
+                android:id="@+id/ep_xingzuo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:isendline="true"
+                app:itemtitle="星座"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/little_gray"
+                android:gravity="center_vertical"
+                android:paddingLeft="5dp"
+                android:text="个人信息"
+                android:textColor="@color/gray"
+                android:textSize="14sp"
+                />
+
+            <com.example.android_adlive_master.widget.EditProfileItem
+                android:id="@+id/ep_home_country"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemtitle="家乡"
+                />
+
+            <com.example.android_adlive_master.widget.EditProfileItem
+                android:id="@+id/ep_job"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemtitle="职业"
+                />
+
+            <com.example.android_adlive_master.widget.EditProfileItem
+                android:id="@+id/ep_active_area"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemtitle="活跃地带"
+                />
+
+            <com.example.android_adlive_master.widget.EditProfileItem
+                android:id="@+id/ep_signature"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:isendline="true"
+                app:itemtitle="个性签名"
+                />
+            <Button
+                android:layout_marginTop="50dp"
+                android:id="@+id/bt_save_profile"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_save_profile"
+                android:text="保存"
+                android:textSize="24sp"
+                android:textColor="@color/white"
+                />
+
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+</LinearLayout>
