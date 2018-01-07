@@ -14,7 +14,7 @@ import com.example.android_adlive_master.app.AdouApplication;
 public class ImageUtils {
     static ImageUtils imageUtils = new ImageUtils();
 
-    public static ImageUtils getInastance() {
+    public static ImageUtils getInstance() {
         return imageUtils;
     }
 

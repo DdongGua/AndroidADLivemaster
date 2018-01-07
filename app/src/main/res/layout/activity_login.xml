@@ -29,7 +29,6 @@
             android:lines="1"
             android:background="@null"
             android:textSize="18sp"
-            android:text="jinruisr"
             android:hint="请输入用户名"
             android:layout_marginLeft="30dp"/>
 
@@ -55,7 +54,6 @@
             android:inputType="textPassword"
             android:lines="1"
             android:background="@null"
-            android:text="12345678"
             android:textSize="18sp"
             android:hint="请输入密码"
             android:layout_marginLeft="30dp"/>

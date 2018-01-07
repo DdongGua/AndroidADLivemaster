@@ -2,6 +2,7 @@ package com.example.android_adlive_master.ui.editprofile;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -11,19 +12,28 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.android_adlive_master.R;
+import com.example.android_adlive_master.app.QiniuConfig;
 import com.example.android_adlive_master.bean.AdouTimUserProfile;
 import com.example.android_adlive_master.engine.PicChooseHelper;
+import com.example.android_adlive_master.qiniu.QiniuUploadHelper;
 import com.example.android_adlive_master.utils.ToastUtils;
-import com.example.android_adlive_master.view.MainActivity;
+import com.example.android_adlive_master.ui.home.MainActivity;
 import com.example.android_adlive_master.widget.EditProfileAvatarDialog;
 import com.example.android_adlive_master.widget.EditProfileDialog;
 import com.example.android_adlive_master.widget.EditProfileDialog2;
 import com.example.android_adlive_master.widget.EditProfileItem;
 import com.example.android_adlive_master.widget.EditProfile_Gender_Dialog;
+import com.orhanobut.logger.Logger;
+import com.qiniu.android.http.ResponseInfo;
+import com.qiniu.android.storage.UpCompletionHandler;
 import com.tencent.TIMCallBack;
 import com.tencent.TIMFriendGenderType;
 import com.tencent.TIMFriendshipManager;
 import com.tencent.TIMUserProfile;
+
+import org.json.JSONObject;
+
+import java.io.File;
 
 public class EditProfileActivity extends Activity implements EditProfileContract.View, View.OnClickListener {
 
@@ -49,12 +59,18 @@ public class EditProfileActivity extends Activity implements EditProfileContract
     EditProfileAvatarDialog avatarDialog;
     private Uri outUri;
     private Button bt_save_profile;
+    private SharedPreferences sp;
+    private SharedPreferences.Editor edit;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
+        sp = getSharedPreferences("isfirstenter", MODE_PRIVATE);
+        edit = sp.edit();
+        edit.putBoolean("isfirst",false);
+        edit.commit();
         initView();
         initPresenter();
         initListener();
@@ -112,6 +128,9 @@ public class EditProfileActivity extends Activity implements EditProfileContract
             TIMFriendGenderType gender = userProfile.getGender();
             String location = userProfile.getLocation();
             String selfSignature = userProfile.getSelfSignature();
+            if (!TextUtils.isEmpty(faceUrl)) {
+                ep_avatar.setAvatar(faceUrl);
+            }
             if (!TextUtils.isEmpty(nickName)) {
                 ep_nickname.setValue(nickName);
             }
@@ -195,20 +214,8 @@ public class EditProfileActivity extends Activity implements EditProfileContract
     *点击修改头像
     */
     public void showSelectAvatarDialog() {
-        avatarDialog = new EditProfileAvatarDialog(this, R.style.common_dialog_style, new EditProfileAvatarDialog.OnEditChangedListener() {
-            @Override
-            public void onChanged(String value) {
-
-            }
-
-            @Override
-            public void onContentEmpty() {
-
-            }
-        });
+        avatarDialog = new EditProfileAvatarDialog(this, R.style.common_dialog_style);
         avatarDialog.show();
-
-
     }
 
     /*
@@ -329,6 +336,7 @@ public class EditProfileActivity extends Activity implements EditProfileContract
         activeDialog.show();
 
     }
+
     /*
     *点击更改个性签名
     */
@@ -341,6 +349,7 @@ public class EditProfileActivity extends Activity implements EditProfileContract
                     @Override
                     public void onError(int i, String s) {
                     }
+
                     @Override
                     public void onSuccess() {
                         signatrueDialog.hide();
@@ -349,6 +358,7 @@ public class EditProfileActivity extends Activity implements EditProfileContract
                     }
                 });
             }
+
             @Override
             public void onChangeError() {
             }
@@ -366,10 +376,55 @@ public class EditProfileActivity extends Activity implements EditProfileContract
             public void onReady(Uri outUri) {
                 ep_avatar.setAvatar(outUri);
                 avatarDialog.dismiss();
+                //需要把路径传到服务器（七牛云）
+                String path = outUri.getPath();
+                File file = new File(path);
+                String absolutePath = file.getAbsolutePath();
+                String name = file.getName();
+                try {
+                    QiniuUploadHelper.uploadPic(absolutePath, name, new UpCompletionHandler() {
+                        @Override
+                        public void complete(String key, ResponseInfo info, JSONObject response) {
+                            //res包含hash、key等信息，具体字段取决于上传策略的设置
+
+                            if (info.isOK()) {
+                                updateNetAvatarInfo(QiniuConfig.QINIU_HOST + key);
+
+                            } else {
+                                //如果失败，这里可以把info信息上报自己的服务器，便于后面分析上传错误原因
+
+
+                                Logger.i("qiniu", "Upload Fail");
+
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         });
     }
 
+    private void updateNetAvatarInfo(String url) {
+        //需要把图片同步到服务器
+
+        TIMFriendshipManager.getInstance().setFaceUrl(url, new TIMCallBack() {
+            @Override
+            public void onError(int i, String s) {
+                updateInfoError();
+            }
+
+            @Override
+            public void onSuccess() {
+                //重置信息
+                presenter.onUpdateInfoSuccess();
+
+            }
+        });
+
+    }
 
 
 }

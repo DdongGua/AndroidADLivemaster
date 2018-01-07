@@ -1,4 +1,4 @@
-package com.example.android_adlive_master.view;
+package com.example.android_adlive_master.splash;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 
 import com.example.android_adlive_master.R;
 import com.example.android_adlive_master.ui.login.LoginActivity;
-import com.example.android_adlive_master.ui.regist.RegistActivity;
 
 /**
  * Created by 亮亮 on 2017/12/31.

@@ -116,11 +116,11 @@ public class EditProfileItem extends FrameLayout {
 
     }
     public void setAvatar(String path){
-        ImageUtils.getInastance().loadCircle(path,iv_editprofile_avatar);
+        ImageUtils.getInstance().loadCircle(path,iv_editprofile_avatar);
 
     }
     public void setAvatar(Uri path){
-        ImageUtils.getInastance().loadCircle(path,iv_editprofile_avatar);
+        ImageUtils.getInstance().loadCircle(path,iv_editprofile_avatar);
 
     }
     public enum ItemType{

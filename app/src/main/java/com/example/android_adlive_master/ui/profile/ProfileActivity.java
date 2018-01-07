@@ -90,9 +90,9 @@ public class ProfileActivity extends Activity implements View.OnClickListener,Pr
     public void updateProfile(AdouTimUserProfile profile) {
         //更新view,设置图片跟字段
         if(!TextUtils.isEmpty(profile.getProfile().getFaceUrl())){
-            ImageUtils.getInastance().loadCircle(profile.getProfile().getFaceUrl(),iv_avatar);
+            ImageUtils.getInstance().loadCircle(profile.getProfile().getFaceUrl(),iv_avatar);
         }else {
-            ImageUtils.getInastance().loadCircle(R.mipmap.splash_image,iv_avatar);
+            ImageUtils.getInstance().loadCircle(R.mipmap.splash_image,iv_avatar);
         }
         if(!TextUtils.isEmpty(profile.getProfile().getNickName())){
             tv_nickname.setText(profile.getProfile().getNickName());
