@@ -10,6 +10,7 @@ import java.util.List;
  */
 
 public interface CustomTimProfileInfo {
+        //前缀必须是这个
         String PREFIX="Tag_Profile_Custom_";
         String INFO_SEND = PREFIX+"send";
         String INFO_RECEIVE = PREFIX+"receive";

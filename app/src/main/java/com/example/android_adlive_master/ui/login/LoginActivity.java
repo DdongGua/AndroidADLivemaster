@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.android_adlive_master.R;
-import com.example.android_adlive_master.ui.profile.ProfileActivity;
 import com.example.android_adlive_master.ui.regist.RegistActivity;
 import com.example.android_adlive_master.utils.ToastUtils;
 

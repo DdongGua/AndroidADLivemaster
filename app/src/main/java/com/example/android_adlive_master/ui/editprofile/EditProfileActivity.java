@@ -16,6 +16,7 @@ import com.example.android_adlive_master.app.QiniuConfig;
 import com.example.android_adlive_master.bean.AdouTimUserProfile;
 import com.example.android_adlive_master.engine.PicChooseHelper;
 import com.example.android_adlive_master.qiniu.QiniuUploadHelper;
+import com.example.android_adlive_master.timcustom.CustomTimProfileInfo;
 import com.example.android_adlive_master.utils.ToastUtils;
 import com.example.android_adlive_master.ui.home.MainActivity;
 import com.example.android_adlive_master.widget.EditProfileAvatarDialog;
@@ -30,6 +31,7 @@ import com.tencent.TIMCallBack;
 import com.tencent.TIMFriendGenderType;
 import com.tencent.TIMFriendshipManager;
 import com.tencent.TIMUserProfile;
+import com.tencent.TIMValueCallBack;
 
 import org.json.JSONObject;
 
@@ -57,6 +59,7 @@ public class EditProfileActivity extends Activity implements EditProfileContract
     EditProfileDialog2 signatrueDialog;
     EditProfile_Gender_Dialog genderDialog;
     EditProfileAvatarDialog avatarDialog;
+    EditProfileDialog2 editXingzuoDialog;
     private Uri outUri;
     private Button bt_save_profile;
     private SharedPreferences sp;
@@ -69,7 +72,7 @@ public class EditProfileActivity extends Activity implements EditProfileContract
         setContentView(R.layout.activity_edit_profile);
         sp = getSharedPreferences("isfirstenter", MODE_PRIVATE);
         edit = sp.edit();
-        edit.putBoolean("isfirst",false);
+        edit.putBoolean("isfirst", false);
         edit.commit();
         initView();
         initPresenter();
@@ -150,6 +153,11 @@ public class EditProfileActivity extends Activity implements EditProfileContract
             } else {
                 ep_gender.setValue("不详");
             }
+            //自定义信息
+            String xingzuo = profile.getXingzuo();
+            if (!TextUtils.isEmpty(xingzuo)) {
+                ep_xingzuo.setValue(xingzuo);
+            }
 
 
         }
@@ -170,7 +178,7 @@ public class EditProfileActivity extends Activity implements EditProfileContract
     @Override
     public void updateInfoSuccess() {
         ToastUtils.show("更新信息成功");
-        presenter.getUserInfo();
+//        presenter.getUserInfo();
 
     }
 
@@ -197,6 +205,7 @@ public class EditProfileActivity extends Activity implements EditProfileContract
 
                 break;
             case R.id.ep_xingzuo:
+//                showEditXingzuoDialog();
                 break;
             case R.id.bt_save_profile:
                 finish();
@@ -337,6 +346,43 @@ public class EditProfileActivity extends Activity implements EditProfileContract
 
     }
 
+//    /*
+//     *点击修改星座
+//     */
+//    private void showEditXingzuoDialog() {
+//        editXingzuoDialog = new EditProfileDialog2(this, new EditProfileDialog2.OnProfileChangedListener() {
+//            @Override
+//            public void onChangeSuccess(final String value) {
+//
+//                TIMFriendshipManager.getInstance().setCustomInfo(CustomTimProfileInfo.INFO_XINGZUO, value.getBytes(), new TIMCallBack() {
+//                    @Override
+//                    public void onError(int i, String s) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onSuccess() {
+//
+//                        editXingzuoDialog.hide();
+//                        editXingzuoDialog = null;
+//                        presenter.onUpdateInfoSuccess();
+//                        Logger.e(value);
+//                        ep_xingzuo.setValue(value);
+//                    }
+//                });
+//
+//
+//            }
+//
+//            @Override
+//            public void onChangeError() {
+//            }
+//        });
+//        editXingzuoDialog.setTitleAndIcon("请输入您的星座", R.mipmap.male);
+//        editXingzuoDialog.show();
+//
+//    }
+
     /*
     *点击更改个性签名
     */
@@ -371,12 +417,12 @@ public class EditProfileActivity extends Activity implements EditProfileContract
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        PicChooseHelper.getInstance(this).onActivityResult(requestCode, resultCode, data, new PicChooseHelper.OnAvatarReadyListener() {
+        PicChooseHelper.getInstance(this).onActivityResult(requestCode, resultCode, data, PicChooseHelper.CropType.Avatar,new PicChooseHelper.OnPicReadyListener() {
             @Override
             public void onReady(Uri outUri) {
                 ep_avatar.setAvatar(outUri);
                 avatarDialog.dismiss();
-                //需要把路径传到服务器（七牛云）
+                //需要把路径传到服务器（七牛）
                 String path = outUri.getPath();
                 File file = new File(path);
                 String absolutePath = file.getAbsolutePath();
@@ -384,24 +430,24 @@ public class EditProfileActivity extends Activity implements EditProfileContract
                 try {
                     QiniuUploadHelper.uploadPic(absolutePath, name, new UpCompletionHandler() {
                         @Override
-                        public void complete(String key, ResponseInfo info, JSONObject response) {
+                        public void complete(String key, ResponseInfo info, JSONObject res) {
                             //res包含hash、key等信息，具体字段取决于上传策略的设置
-
                             if (info.isOK()) {
+
+                                Logger.i("qiniu", "Upload Success");
                                 updateNetAvatarInfo(QiniuConfig.QINIU_HOST + key);
 
                             } else {
-                                //如果失败，这里可以把info信息上报自己的服务器，便于后面分析上传错误原因
-
-
                                 Logger.i("qiniu", "Upload Fail");
-
+                                //如果失败，这里可以把info信息上报自己的服务器，便于后面分析上传错误原因
                             }
+                            Log.i("qiniu", key + ",\r\n " + info + ",\r\n " + res);
                         }
                     });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
 
             }
         });
@@ -425,7 +471,5 @@ public class EditProfileActivity extends Activity implements EditProfileContract
         });
 
     }
-
-
 }
 

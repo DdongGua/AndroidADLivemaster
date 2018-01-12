@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TabHost;
 
 import com.example.android_adlive_master.R;
+import com.example.android_adlive_master.ui.createlive.CreateLiveActivity;
 import com.example.android_adlive_master.ui.mine.MineFragment;
 
 /**
@@ -22,7 +23,7 @@ public class MainActivity extends FragmentActivity {
 
     private FragmentManager fragmentManager;
     private Toolbar toolbar;
-    private FrameLayout tabcontext;
+//    private FrameLayout tabcontext;
     private FragmentTabHost tabHost;
 
     @Override
@@ -60,9 +61,18 @@ public class MainActivity extends FragmentActivity {
         TabHost.TabSpec tabSpec_create = tabHost.newTabSpec("create").setIndicator(getIndicatorView("create"));
         TabHost.TabSpec tabSpec_mine = tabHost.newTabSpec("mine").setIndicator(getIndicatorView("mine"));
         tabHost.addTab(tabSpec_home,HomeFragment.class,null);
-        tabHost.addTab(tabSpec_create,HomeFragment.class,null);
-        tabHost.addTab(tabSpec_mine, MineFragment.class,null);
+        //发起直播按钮
+        tabHost.addTab(tabSpec_create,null,null);
+        tabHost.addTab(tabSpec_mine,MineFragment.class,null);
         tabHost.getTabWidget().setDividerDrawable(R.color.transprant);
+        //定义事件将tabspec事件拦截
+        tabHost.getTabWidget().getChildTabViewAt(1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent= new Intent(MainActivity.this,CreateLiveActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     public View getIndicatorView(String tag) {

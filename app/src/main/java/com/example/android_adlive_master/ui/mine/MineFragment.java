@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,7 @@ import com.tencent.TIMFriendGenderType;
  */
 
 public class MineFragment extends Fragment  implements ProfileContract.View{
-
+    private static final String TAG = "MineFragment";
     private ConstraintLayout cl_profile;
     private ProfileContract.Presenter presenter;
 

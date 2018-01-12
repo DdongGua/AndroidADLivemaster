@@ -24,7 +24,6 @@ import com.example.android_adlive_master.engine.PicChooseHelper;
 public class EditProfileAvatarDialog implements View.OnClickListener {
 
 
-
     private TextView tv_photo;
     private TextView tv_camera;
     private LinearLayout ll_cancel;
@@ -72,6 +71,7 @@ public class EditProfileAvatarDialog implements View.OnClickListener {
         ll_cancel.setOnClickListener(this);
 
         dialog.setContentView(v);
+        //通过window设置dialog的宽高和位置
         Window window = dialog.getWindow();
         WindowManager.LayoutParams attributes = window.getAttributes();
         attributes.width = display.getWidth();
@@ -91,7 +91,7 @@ public class EditProfileAvatarDialog implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_photo:
-               PicChooseHelper.getInstance(activity).startPhotoSelectIntent();
+                PicChooseHelper.getInstance(activity).startPhotoSelectIntent();
                 break;
             case R.id.tv_camera:
                 PicChooseHelper.getInstance(activity).startCameraIntent();

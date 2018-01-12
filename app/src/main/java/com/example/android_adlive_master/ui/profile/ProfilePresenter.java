@@ -1,6 +1,8 @@
 package com.example.android_adlive_master.ui.profile;
 
 
+import android.util.Log;
+
 import com.example.android_adlive_master.app.AdouApplication;
 import com.example.android_adlive_master.bean.AdouTimUserProfile;
 import com.example.android_adlive_master.engine.TimProfileHelper;
@@ -12,7 +14,7 @@ import com.example.android_adlive_master.ui.mine.MineFragment;
 
 public class ProfilePresenter implements ProfileContract.Presenter{
 
-
+    private static final String TAG = "ProfilePresenter";
     ProfileContract.View view;
     MineFragment mineFragment;
 
@@ -32,6 +34,7 @@ public class ProfilePresenter implements ProfileContract.Presenter{
                 @Override
                 public void noGet() {
                     //没有获取到
+                    Log.e(TAG, "noGet: 没有获取到++" );
                     view.updateProfileError();
 
                 }

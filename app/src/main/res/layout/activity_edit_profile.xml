@@ -104,18 +104,18 @@
                 app:isendline="true"
                 app:itemtitle="个性签名"
                 />
+
             <Button
-                android:layout_marginTop="50dp"
                 android:id="@+id/bt_save_profile"
-                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
                 android:background="@drawable/selector_save_profile"
+                android:gravity="center"
                 android:text="保存"
-                android:textSize="24sp"
                 android:textColor="@color/white"
+                android:textSize="24sp"
                 />
-
 
 
         </LinearLayout>

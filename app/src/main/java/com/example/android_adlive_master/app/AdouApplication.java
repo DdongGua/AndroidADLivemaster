@@ -62,9 +62,13 @@ public class AdouApplication extends Application {
         if (MsfSdkUtils.isMainProcess(this)) {    // 仅在主线程初始化
 
             ILiveLog.setLogLevel(ILiveLog.TILVBLogLevel.DEBUG);
+            //me
             ILiveSDK.getInstance().initSdk(this, 1400059677, 21072);
+            //guaju
+            ILiveSDK.getInstance().initSdk(this, 1400059239, 21019);
             ILVLiveManager.getInstance().init(new ILVLiveConfig()
                            .setLiveMsgListener(MessageObservable.getInstance()));
+//              //初始化自定义资料信息
 //            long type = CustomTimProfileInfo.ALL_BASE_INFO;
 //            List<String> customFields=new ArrayList<>();
 //            customFields.add(CustomTimProfileInfo.INFO_FANS);

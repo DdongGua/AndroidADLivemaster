@@ -22,6 +22,11 @@ import java.io.IOException;
  */
 
 public class PicChooseHelper {
+
+    public enum CropType {
+        Avatar, Cover;
+    }
+
     private static final int REQUEST_SELECT_PHOTO = 101;
     private static final int REQUEST_TAKE_CAMERA = 102;
     private static final int REQUEST_CROP = 103;
@@ -32,7 +37,7 @@ public class PicChooseHelper {
     private Uri outUri;
 
 
-    public interface OnAvatarReadyListener {
+    public interface OnPicReadyListener {
         void onReady(Uri outUri);
     }
 
@@ -55,21 +60,21 @@ public class PicChooseHelper {
     public Uri getImageContentUri(Uri uri) {
         String filePath = uri.getPath();
         Cursor cursor = AdouApplication.getApp().getContentResolver().query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                new String[]{MediaStore.Images.Media._ID},
-                MediaStore.Images.Media.DATA + "=? ",
-                new String[]{filePath}, null);
+                       MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                       new String[]{MediaStore.Images.Media._ID},
+                       MediaStore.Images.Media.DATA + "=? ",
+                       new String[]{filePath}, null);
 
         if (cursor != null && cursor.moveToFirst()) {
             int id = cursor.getInt(cursor
-                    .getColumnIndex(MediaStore.MediaColumns._ID));
+                           .getColumnIndex(MediaStore.MediaColumns._ID));
             Uri baseUri = Uri.parse("content://media/external/images/media");
             return Uri.withAppendedPath(baseUri, "" + id);
         } else {
             ContentValues values = new ContentValues();
             values.put(MediaStore.Images.Media.DATA, filePath);
             return AdouApplication.getApp().getContentResolver().insert(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                           MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         }
     }
 
@@ -133,7 +138,7 @@ public class PicChooseHelper {
         return Uri.fromFile(picFile);
     }
 
-       //把24版本的不符合规定的uri转成content://开头的uri，这样就可以使用了
+    //把24版本的不符合规定的uri转成content://开头的uri，这样就可以使用了
     public Uri formatUri(Uri uri) {
         Uri rightUri = uri;
         int sdkInt = Build.VERSION.SDK_INT;//拿到当前手机版本
@@ -151,7 +156,8 @@ public class PicChooseHelper {
 
         return rightUri;
     }
-       //为了拿到相机拍照后得到的图片uri
+
+    //为了拿到相机拍照后得到的图片uri
     public Uri getAlbumUri() {
         return createAlbumUri;
     }
@@ -174,6 +180,7 @@ public class PicChooseHelper {
         }
         mActivity.startActivityForResult(intentCamera, REQUEST_TAKE_CAMERA);
     }
+
     //开启选择相册的意图
     public void startPhotoSelectIntent() {
         //选择相册
@@ -184,7 +191,7 @@ public class PicChooseHelper {
     }
 
     //开启截图意图
-    private void startCrop(Intent data) {
+    private void startCrop(Intent data, CropType cropType) {
         Uri uri;
         if (data == null) {
             uri = getAlbumUri();
@@ -196,10 +203,19 @@ public class PicChooseHelper {
         //创建裁剪之后那个uri
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.putExtra("crop", "true");
-        intent.putExtra("aspectX", 500);
-        intent.putExtra("aspectY", 500);
-        intent.putExtra("outputX", 500);
-        intent.putExtra("outputY", 500);
+        if (cropType == CropType.Avatar) {
+            intent.putExtra("aspectX", 500);
+            intent.putExtra("aspectY", 500);
+            intent.putExtra("outputX", 500);
+            intent.putExtra("outputY", 500);
+        } else if (cropType == CropType.Cover) {
+            intent.putExtra("aspectX", 500);
+            intent.putExtra("aspectY", 300);
+            intent.putExtra("outputX", 500);
+            intent.putExtra("outputY", 300);
+
+        }
+
         // 设置为true直接返回bitmap,这里不做输出，只需要指定我们自己定义uri即可
         intent.putExtra("return-data", false);
         //设置输出图片格式
@@ -215,14 +231,15 @@ public class PicChooseHelper {
         mActivity.startActivityForResult(intent, REQUEST_CROP);
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data,OnAvatarReadyListener listener) {
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data,CropType cropType,OnPicReadyListener listener) {
         if (requestCode == REQUEST_SELECT_PHOTO) {
             if (resultCode == Activity.RESULT_OK) {
-                startCrop(data);
+                startCrop(data,cropType);
             }
         } else if (requestCode == REQUEST_TAKE_CAMERA) {
             if (resultCode == Activity.RESULT_OK) {
-                startCrop(data);
+                startCrop(data,cropType);
             }
         } else if (requestCode == REQUEST_CROP) {
             if (resultCode == Activity.RESULT_OK) {
@@ -233,4 +250,6 @@ public class PicChooseHelper {
 
         }
     }
+
 }
+

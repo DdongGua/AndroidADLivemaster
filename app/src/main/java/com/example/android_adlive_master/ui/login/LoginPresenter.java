@@ -9,7 +9,6 @@ import android.util.Log;
 import com.example.android_adlive_master.engine.TimProfileHelper;
 import com.example.android_adlive_master.ui.editprofile.EditProfileActivity;
 import com.example.android_adlive_master.ui.home.MainActivity;
-import com.example.android_adlive_master.ui.profile.ProfileActivity;
 import com.tencent.ilivesdk.ILiveCallBack;
 import com.tencent.ilivesdk.core.ILiveLoginManager;
 

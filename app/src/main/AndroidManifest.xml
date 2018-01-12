@@ -33,8 +33,13 @@
             android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.editprofile.EditProfileActivity"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.createlive.CreateLiveActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.host.HostLiveActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
