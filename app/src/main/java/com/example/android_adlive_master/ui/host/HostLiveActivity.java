@@ -1,6 +1,7 @@
 package com.example.android_adlive_master.ui.host;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +22,7 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View 
 
     private HostLivePresenter presenter;
     private Toolbar toolbar;
+    private int roomId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,7 +41,7 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View 
             public void onClick(View v) {
                 //关闭
                 //退出直播然后关闭
-                finish();
+                presenter.quitHost(roomId);
             }
         });
     }
@@ -50,7 +52,7 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View 
             public void onClick(View v) {
                 //关闭
                 //退出直播，然后关闭
-                finish();
+               presenter.quitHost(roomId);
             }
         });
 
@@ -58,7 +60,11 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View 
     }
 
     private void initCreateHost() {
-        presenter.createHost();
+        Intent intent = getIntent();
+        if (intent!=null){
+            roomId = intent.getIntExtra("roomId", -1);
+        }
+        presenter.createHost(roomId);
     }
 
     private void initPresenter() {

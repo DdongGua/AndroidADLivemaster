@@ -16,7 +16,6 @@ import com.example.android_adlive_master.app.QiniuConfig;
 import com.example.android_adlive_master.bean.AdouTimUserProfile;
 import com.example.android_adlive_master.engine.PicChooseHelper;
 import com.example.android_adlive_master.qiniu.QiniuUploadHelper;
-import com.example.android_adlive_master.timcustom.CustomTimProfileInfo;
 import com.example.android_adlive_master.utils.ToastUtils;
 import com.example.android_adlive_master.ui.home.MainActivity;
 import com.example.android_adlive_master.widget.EditProfileAvatarDialog;
@@ -31,7 +30,6 @@ import com.tencent.TIMCallBack;
 import com.tencent.TIMFriendGenderType;
 import com.tencent.TIMFriendshipManager;
 import com.tencent.TIMUserProfile;
-import com.tencent.TIMValueCallBack;
 
 import org.json.JSONObject;
 
@@ -261,7 +259,7 @@ public class EditProfileActivity extends Activity implements EditProfileContract
 
             }
         });
-        editProfileDialog.setTitleAndIcon("请输入您的昵称", R.mipmap.splash_image);
+        editProfileDialog.setTitleAndIcon("请输入您的昵称", R.mipmap.splash_anima);
         editProfileDialog.show();
 
     }

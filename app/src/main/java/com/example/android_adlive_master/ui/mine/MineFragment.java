@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,8 +38,8 @@ public class MineFragment extends Fragment  implements ProfileContract.View{
     private TextView tv_acount_id;
     private ImageView iv_gender;
     private TextView tv_grade;
-    private TextView tv_my_fork;
-    private TextView tv_my_fans;
+    private TextView tv_receive;
+    private TextView tv_send;
     private MainActivity mainActivity;
 
 
@@ -67,14 +66,13 @@ public class MineFragment extends Fragment  implements ProfileContract.View{
 
     private void initView(View view) {
         cl_profile = view.findViewById(R.id.cl_profile);
-        cl_profile = view.findViewById(R.id.cl_profile);
         iv_avatar = view.findViewById(R.id.iv_avatar);
         tv_nickname = view.findViewById(R.id.tv_nickname);
         tv_acount_id = view.findViewById(R.id.tv_acount_id);
         iv_gender = view.findViewById(R.id.iv_gender);
         tv_grade = view.findViewById(R.id.tv_grade);
-        tv_my_fans = view.findViewById(R.id.tv_my_fans);
-        tv_my_fork = view.findViewById(R.id.tv_my_fork);
+        tv_receive= view.findViewById(R.id.tv_receive);
+        tv_send = view.findViewById(R.id.tv_send);
 
     }
 
@@ -100,7 +98,7 @@ public class MineFragment extends Fragment  implements ProfileContract.View{
         if (!TextUtils.isEmpty(profile.getProfile().getFaceUrl())){
             ImageUtils.getInstance().loadCircle(profile.getProfile().getFaceUrl(),iv_avatar);
         } else{
-            ImageUtils.getInstance().loadCircle(R.mipmap.ic_launcher,iv_avatar);
+            ImageUtils.getInstance().loadCircle(R.mipmap.splash_anima,iv_avatar);
         }
 
 
@@ -121,8 +119,8 @@ public class MineFragment extends Fragment  implements ProfileContract.View{
             iv_gender.setBackgroundResource(R.mipmap.male);
         }
         tv_grade.setText(profile.getGrade()+"");
-        tv_my_fork.setText(profile.getFork()+"");
-        tv_my_fans.setText(profile.getFans()+"");
+        tv_send.setText(profile.getFork()+"");
+        tv_receive.setText(profile.getFans()+"");
 
     }
 

@@ -11,7 +11,7 @@
         android:layout_marginTop="190dp"
         android:layout_width="92dp"
         android:layout_height="92dp"
-        android:background="@mipmap/splash_image"/>
+        android:background="@mipmap/splash_anima"/>
     <ImageView
         android:layout_width="92dp"
         android:layout_height="21dp"

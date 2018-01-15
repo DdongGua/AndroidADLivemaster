@@ -3,7 +3,7 @@ package com.example.android_adlive_master.bean;
 /**
  * Created by 亮亮 on 2018/1/11.
  */
-
+//直播房间的一些信息
 public class HomeInfo {
     /**
      * roomId : 894
@@ -78,5 +78,4 @@ public class HomeInfo {
     public void setWatcherNums(int watcherNums) {
         this.watcherNums = watcherNums;
     }
-
 }

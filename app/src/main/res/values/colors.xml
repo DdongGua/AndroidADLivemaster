@@ -20,6 +20,7 @@
     <color name="green">#0f0</color>
     <color name="transprant">#0fff</color>
     <color name="pink_pressed">#f00</color>
+    <color name="yellow">#fcf635</color>
 
 
 </resources>

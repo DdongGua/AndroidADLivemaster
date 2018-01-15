@@ -5,26 +5,24 @@
     <application
         android:name=".app.AdouApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/splash_image"
+        android:icon="@mipmap/splash_anima"
         android:label="阿斗直播"
-        android:roundIcon="@mipmap/splash_image"
+        android:roundIcon="@mipmap/splash_anima"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".splash.SplashPage"
             android:screenOrientation="portrait"
             >
-        </activity>
-        <activity
-            android:name=".ui.login.LoginActivity"
-            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        >
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.regist.RegistActivity"
             android:screenOrientation="portrait"/>
@@ -39,6 +37,9 @@
             android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.host.HostLiveActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.watch.WatchLiveActivity"
             android:screenOrientation="portrait"/>
     </application>
 

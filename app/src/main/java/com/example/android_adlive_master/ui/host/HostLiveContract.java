@@ -7,8 +7,10 @@ package com.example.android_adlive_master.ui.host;
 public interface HostLiveContract {
     interface View{
 
+
     }
     interface Presenter{
-        void createHost();
+        void createHost(int roomId);
+        void quitHost(int roomId);
     }
 }
