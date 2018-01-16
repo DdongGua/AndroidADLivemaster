@@ -27,22 +27,22 @@ public class HostLivePresenter implements HostLiveContract.Presenter {
         LiveHelper.getInstance(hostLiveActivity).createRoom(roomId + "");
 
     }
-
-    @Override
-    public void quitHost(int roomId) {
-        //获取userId 和房间id，然后退出
-        TIMUserProfile profile = AdouApplication.getApp().getAdouTimUserProfile().getProfile();
-        String userId = profile.getIdentifier();
-        HashMap<String, String> map = new HashMap<>();
-        map.put("action", "quit");
-        map.put("userId", userId);
-        map.put("roomId", roomId + "");
-        OkHttpHelper.getInstance().postString(Constant.HOST, map, new BaseOnRequestComplete<String>() {
-            @Override
-            public void onSuccess(String s) {
-                hostLiveActivity.finish();
-            }
-        });
-
-    }
+      //退出房间时，将主播删除
+//    @Override
+//    public void quitHost(int roomId) {
+//        //获取userId 和房间id，然后退出
+//        TIMUserProfile profile = AdouApplication.getApp().getAdouTimUserProfile().getProfile();
+//        String userId = profile.getIdentifier();
+//        HashMap<String, String> map = new HashMap<>();
+//        map.put("action", "quit");
+//        map.put("userId", userId);
+//        map.put("roomId", roomId + "");
+//        OkHttpHelper.getInstance().postString(Constant.HOST, map, new BaseOnRequestComplete<String>() {
+//            @Override
+//            public void onSuccess(String s) {
+//                hostLiveActivity.finish();
+//            }
+//        });
+//
+//    }
 }

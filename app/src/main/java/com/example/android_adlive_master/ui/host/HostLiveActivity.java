@@ -5,34 +5,72 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.example.android_adlive_master.R;
+import com.example.android_adlive_master.app.AdouApplication;
+import com.example.android_adlive_master.bean.TextMsgInfo;
+import com.example.android_adlive_master.engine.MessageObservable;
+import com.example.android_adlive_master.timcustom.CustomTimConstant;
+import com.example.android_adlive_master.utils.ToastUtils;
+import com.example.android_adlive_master.widget.BottomChatSwitchLayout;
+import com.example.android_adlive_master.widget.BottomSwitchLayout;
+import com.example.android_adlive_master.widget.HeightSensenableConstrantLayout;
+import com.example.android_adlive_master.widget.LiveMsgListView;
+import com.tencent.TIMFriendshipManager;
+import com.tencent.TIMMessage;
+import com.tencent.TIMUserProfile;
+import com.tencent.TIMValueCallBack;
+import com.tencent.ilivesdk.ILiveCallBack;
 import com.tencent.ilivesdk.view.AVRootView;
+import com.tencent.livesdk.ILVCustomCmd;
+import com.tencent.livesdk.ILVLiveConfig;
 import com.tencent.livesdk.ILVLiveManager;
+import com.tencent.livesdk.ILVText;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by 亮亮 on 2018/1/9.
  */
 
-public class HostLiveActivity extends Activity implements HostLiveContract.View {
+public class HostLiveActivity extends Activity implements HostLiveContract.View, ILVLiveConfig.ILVLiveMsgListener {
     private AVRootView avRootView;
-    private ImageView iv_switch_camera,iv_close;
-
     private HostLivePresenter presenter;
     private Toolbar toolbar;
     private int roomId;
+    private BottomSwitchLayout bottomswitchlayout;
+    private BottomChatSwitchLayout chatswitchlayout;
+    private LiveMsgListView lmlv;
+    private HeightSensenableConstrantLayout heightscl;
+    private String sendserId;//接受到的信息发送者id
+    //创建集合专门存储消息
+    private ArrayList<TextMsgInfo> mList = new ArrayList<TextMsgInfo>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_host_live);
         initView();
+        //1.初始化消息的接受者
+        MessageObservable.getInstance().addObserver(this);
+        //设置默认状态
+        setDefultStatus();
+        lmlv.setData(mList);
         initPresenter();
         initListener();
+        setBottomSwitchListener();
+
         initCreateHost();
         initToolbar();
+    }
+
+    private void setDefultStatus() {
+        chatswitchlayout.setVisibility(View.INVISIBLE);
+        bottomswitchlayout.setVisibility(View.VISIBLE);
     }
 
     private void initToolbar() {
@@ -41,18 +79,44 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View 
             public void onClick(View v) {
                 //关闭
                 //退出直播然后关闭
-                presenter.quitHost(roomId);
+//                presenter.quitHost(roomId);
+                finish();
             }
         });
     }
 
     private void initListener() {
-        iv_close.setOnClickListener(new View.OnClickListener() {
+        //设置父容器的高度变化监听
+        heightscl.setOnLayoutHeightChangedListenser(new HeightSensenableConstrantLayout.OnLayoutHeightChangedListenser() {
             @Override
-            public void onClick(View v) {
-                //关闭
-                //退出直播，然后关闭
-               presenter.quitHost(roomId);
+            public void showNormal() {
+                setDefultStatus();
+
+            }
+
+            @Override
+            public void showChat() {
+                chatswitchlayout.setVisibility(View.VISIBLE);
+                bottomswitchlayout.setVisibility(View.INVISIBLE);
+
+            }
+        });
+        //设置底部chat 聊天的监听
+        chatswitchlayout.setOnMsgListener(new BottomChatSwitchLayout.OnMsgSendListener() {
+            @Override
+            public void sendMsg(String text) {
+                //主播给客户发消息
+                if (TextUtils.isEmpty(sendserId)) {
+                    sendserId = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier();
+
+                }
+                sendTextMsg(text, sendserId);
+
+            }
+
+            @Override
+            public void danmu(String text) {
+
             }
         });
 
@@ -61,24 +125,28 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View 
 
     private void initCreateHost() {
         Intent intent = getIntent();
-        if (intent!=null){
+        if (intent != null) {
             roomId = intent.getIntExtra("roomId", -1);
         }
         presenter.createHost(roomId);
     }
 
     private void initPresenter() {
-       this.presenter=new HostLivePresenter(this);
+        this.presenter = new HostLivePresenter(this);
     }
 
     private void initView() {
+        heightscl = findViewById(R.id.heightscl);
         toolbar = findViewById(R.id.toolbar);
         avRootView = findViewById(R.id.arv_root);
-        iv_switch_camera = findViewById(R.id.iv_switch_camera);
-        iv_close=findViewById(R.id.iv_close);
+        bottomswitchlayout = findViewById(R.id.bottomswitchlayout);
+        chatswitchlayout = findViewById(R.id.chatswitchlayout);
+        //初始化listview
+        lmlv = findViewById(R.id.lmlv);
         //将avrootview添加
         ILVLiveManager.getInstance().setAvVideoView(avRootView);
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -95,6 +163,127 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View 
     protected void onDestroy() {
         super.onDestroy();
         //退出直播
+//        quitRoom();
         ILVLiveManager.getInstance().onDestory();
+    }
+//    public void quitRoom() {
+//        ILVLiveManager.getInstance().quitRoom(new ILiveCallBack() {
+//            @Override
+//            public void onSuccess(Object data) {
+//                ToastUtils.show("退出直播成功");
+//            }
+//
+//            @Override
+//            public void onError(String module, int errCode, String errMsg) {
+//                ToastUtils.show("退出直播失败，错误码" + errCode + "错误信息：" + errMsg);
+//            }
+//        });
+//    }
+    private void setBottomSwitchListener(){
+        bottomswitchlayout.setOnSwitchListener(new BottomSwitchLayout.OnSwitchListener() {
+            @Override
+            public void onChat() {
+                //聊天
+                chatswitchlayout.setVisibility(View.VISIBLE);
+                bottomswitchlayout.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onClose() {
+                //关闭时
+                finish();
+
+            }
+        });
+    }
+    @Override
+    public void onNewTextMsg(ILVText text, String SenderId, TIMUserProfile userProfile) {
+        //当接受到普通消息的时候，展示到listview上边去
+        sendserId=SenderId;
+        String msg = text.getText();
+        String nickName = userProfile.getNickName();
+        String grade;
+        byte[] bytes = userProfile.getCustomInfo().get(CustomTimConstant.INFO_GRADE);
+        if(bytes!=null){
+            grade = new String(bytes);
+        }else {
+            grade="0";
+        }
+        TextMsgInfo textMsgInfo = new TextMsgInfo(Integer.parseInt(grade),nickName,msg,SenderId);
+        lmlv.addMsg(textMsgInfo);
+    }
+    //自定义消息可以用作弹幕
+    @Override
+    public void onNewCustomMsg(ILVCustomCmd cmd, String id, TIMUserProfile userProfile) {
+
+    }
+    //其它的信息
+    @Override
+    public void onNewOtherMsg(TIMMessage message) {
+
+    }
+    //腾讯云发送普通消息
+    public void sendTextMsg(final String text, String destId){
+        //通过对方id获取对方的等级和对方的昵称
+       List<String> ids =new ArrayList<>();
+       ids.add(destId);
+       //通过对方的id拿到朋友的信息
+        TIMFriendshipManager.getInstance().getFriendsProfile(ids, new TIMValueCallBack<List<TIMUserProfile>>() {
+            @Override
+            public void onError(int i, String s) {
+                
+            }
+
+            @Override
+            public void onSuccess(List<TIMUserProfile> timUserProfiles) {
+                 realSend(timUserProfiles,text);
+            }
+        });
+    }
+    //真正发送的消息
+    private void realSend(List<TIMUserProfile> timUserProfiles, final String text) {
+        //因为获取信息的时候 只传入了只有一个元素的集合，所以到这只能拿到一个用户的信息
+        final TIMUserProfile profile = timUserProfiles.get(0);
+        //发送普通消息
+        ILVLiveManager.getInstance().sendText(new ILVText(ILVText.ILVTextType.eGroupMsg, profile.getIdentifier(), text), new ILiveCallBack() {
+            @Override
+            public void onSuccess(Object data) {
+                String grade=null;
+                String adouId;
+                String nickName;
+                //发送成功之后，加入到listview中
+                TextMsgInfo textMsgInfo = new TextMsgInfo();
+                if(sendserId.equals(AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier())){
+                     grade = AdouApplication.getApp().getAdouTimUserProfile().getGrade() + "";
+                     adouId=AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier();
+                     nickName = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getNickName();
+
+
+                }else {
+                    byte[] bytes = profile.getCustomInfo().get(CustomTimConstant.INFO_GRADE);
+                    if(bytes!=null){
+                        grade = new String(bytes);
+                    }
+                    nickName=profile.getIdentifier();
+
+                }
+                if(TextUtils.isEmpty(grade)){
+                    grade="0";
+                }
+                textMsgInfo.setGrade(Integer.parseInt(grade));
+                textMsgInfo.setText(text);
+                textMsgInfo.setNickname(TextUtils.isEmpty(nickName)?sendserId:nickName);
+                textMsgInfo.setAdouID(sendserId);
+                //更新列表
+                lmlv.addMsg(textMsgInfo);
+
+            }
+
+            @Override
+            public void onError(String module, int errCode, String errMsg) {
+                ToastUtils.show("发送失败，错误信息" + errMsg + "错误码" + errCode);
+
+            }
+        });
     }
 }

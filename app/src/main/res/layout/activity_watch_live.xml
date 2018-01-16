@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<com.example.android_adlive_master.widget.HeightSensenableRelativeLayout
+    android:id="@+id/heightsrl"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -7,5 +8,24 @@
         android:id="@+id/av_rootview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <com.example.android_adlive_master.widget.BottomSwitchLayout
+        android:layout_alignParentBottom="true"
+        android:id="@+id/bottomswitchlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+    <com.example.android_adlive_master.widget.BottomChatSwitchLayout
+        android:id="@+id/chatswitchlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        />
 
-</RelativeLayout>
+    <com.example.android_adlive_master.widget.LiveMsgListView
+        android:id="@+id/lmlv"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_above="@id/bottomswitchlayout"
+        />
+
+</com.example.android_adlive_master.widget.HeightSensenableRelativeLayout>

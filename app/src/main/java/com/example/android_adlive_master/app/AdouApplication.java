@@ -5,20 +5,15 @@ import android.app.Application;
 import com.example.android_adlive_master.bean.AdouTimUserProfile;
 import com.example.android_adlive_master.engine.MessageObservable;
 import com.example.android_adlive_master.qiniu.QiniuUploadHelper;
-import com.example.android_adlive_master.timcustom.CustomTimProfileInfo;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.FormatStrategy;
 import com.orhanobut.logger.Logger;
 import com.orhanobut.logger.PrettyFormatStrategy;
-import com.tencent.TIMManager;
 import com.tencent.ilivesdk.ILiveSDK;
 import com.tencent.ilivesdk.core.ILiveLog;
 import com.tencent.livesdk.ILVLiveConfig;
 import com.tencent.livesdk.ILVLiveManager;
 import com.tencent.qalsdk.sdk.MsfSdkUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by 亮亮 on 2018/1/1.
@@ -69,14 +64,14 @@ public class AdouApplication extends Application {
             ILVLiveManager.getInstance().init(new ILVLiveConfig()
                            .setLiveMsgListener(MessageObservable.getInstance()));
 //              //初始化自定义资料信息
-//            long type = CustomTimProfileInfo.ALL_BASE_INFO;
+//            long type = CustomTimConstant.ALL_BASE_INFO;
 //            List<String> customFields=new ArrayList<>();
-//            customFields.add(CustomTimProfileInfo.INFO_FANS);
-//            customFields.add(CustomTimProfileInfo.INFO_FORK);
-//            customFields.add(CustomTimProfileInfo.INFO_GRADE);
-//            customFields.add(CustomTimProfileInfo.INFO_RECEIVE);
-//            customFields.add(CustomTimProfileInfo.INFO_SEND);
-//            customFields.add(CustomTimProfileInfo.INFO_XINGZUO);
+//            customFields.add(CustomTimConstant.INFO_FANS);
+//            customFields.add(CustomTimConstant.INFO_FORK);
+//            customFields.add(CustomTimConstant.INFO_GRADE);
+//            customFields.add(CustomTimConstant.INFO_RECEIVE);
+//            customFields.add(CustomTimConstant.INFO_SEND);
+//            customFields.add(CustomTimConstant.INFO_XINGZUO);
 //            TIMManager.getInstance().initFriendshipSettings(type,customFields);
 
 

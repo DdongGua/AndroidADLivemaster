@@ -46,8 +46,6 @@ public class HomePresenter implements HomeContract.Presenter {
                 if (baseBean.getData() != null) {
                     //第一次获取数据时直接赋值给list
                     data = baseBean.getData();
-//                    if(data==null||page==0){
-//                        data=baseBean.getData();
                     homeRoomInfoAdapter = new HomeRoomInfoAdapter(homeFragment.getActivity(), data);
                     homeRoomInfoAdapter.setOnMyClickListener(new HomeRoomInfoAdapter.OnMyClickListener() {
                         @Override
@@ -60,19 +58,6 @@ public class HomePresenter implements HomeContract.Presenter {
                         }
                     });
                     view.setHomeRoomInfoAdapter(homeRoomInfoAdapter);
-//当data中有数据，或者page不等于0
-//                    }else {
-//                        //往集合中添加数据
-//                        ArrayList<AllHomeInfo.DataBean> data1 = baseBean.getData();
-////                        int startIndex = data.size();
-////                        int endIndex=  startIndex+ data1.size()-1;
-//
-//                        HomePresenter.this.data.addAll(0,data1);
-//                        homeRoomInfoAdapter = new HomeRoomInfoAdapter(homeFragment.getActivity(), data);
-////                        homeRoomInfoAdapter.notifyItemRangeInserted(startIndex,endIndex);
-//                        view.updataHomeRoomInfoAdapter(homeRoomInfoAdapter);
-//
-//                    }
                 } else {
                     //报数据为空
                     onEmpty();

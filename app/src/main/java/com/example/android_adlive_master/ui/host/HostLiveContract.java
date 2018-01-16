@@ -11,6 +11,7 @@ public interface HostLiveContract {
     }
     interface Presenter{
         void createHost(int roomId);
-        void quitHost(int roomId);
+//        //退出房间
+//        void quitHost(int roomId);
     }
 }

@@ -8,7 +8,6 @@ import com.example.android_adlive_master.app.AdouApplication;
 import com.example.android_adlive_master.bean.AdouTimUserProfile;
 import com.example.android_adlive_master.bean.CreateliveInfo;
 import com.example.android_adlive_master.bean.HomeInfo;
-import com.example.android_adlive_master.bean.HostRoomInfo;
 import com.example.android_adlive_master.engine.live.Constants;
 import com.example.android_adlive_master.httputil.BaseOnRequestComplete;
 import com.example.android_adlive_master.httputil.Constant;
@@ -52,14 +51,6 @@ public class CreateLivePresenter implements CreateLiveContract.Presenter {
         HashMap<String, String> map = new HashMap<>();
         AdouTimUserProfile profile = AdouApplication.getApp().getAdouTimUserProfile();
         TIMUserProfile profile1 = profile.getProfile();
-        //      String nickname = null;
-//        String liveName1=null;
-//        try {
-//            nickname = URLEncoder.encode(profile1.getNickName(),"UTF-8");
-//             liveName1 = URLEncoder.encode(liveName,"UTF-8");
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
         map.put("action", "create");     //动作
         map.put("userId", profile1.getIdentifier());  //主播id
         map.put("userAvatar", profile1.getFaceUrl()); //主播头像

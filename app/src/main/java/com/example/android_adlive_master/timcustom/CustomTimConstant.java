@@ -9,7 +9,7 @@ import java.util.List;
  * Created by 亮亮 on 2018/1/3.
  */
 
-public interface CustomTimProfileInfo {
+public interface CustomTimConstant {
         //前缀必须是这个
         String PREFIX="Tag_Profile_Custom_";
         String INFO_SEND = PREFIX+"send";
