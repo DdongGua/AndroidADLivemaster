@@ -1,4 +1,4 @@
-package com.example.android_adlive_master.widget;
+package com.example.android_adlive_master.widget.chat;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -76,7 +76,7 @@ public class BottomChatSwitchLayout extends FrameLayout {
         void sendMsg(String text);//普通消息
         void danmu(String text);//弹幕
     }
-    public void setOnMsgListener(OnMsgSendListener listener){
+    public void setOnMsgSendListener(OnMsgSendListener listener){
         mListener=listener;
 
     }

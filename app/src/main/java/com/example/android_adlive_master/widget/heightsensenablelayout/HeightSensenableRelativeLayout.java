@@ -1,21 +1,21 @@
-package com.example.android_adlive_master.widget;
+package com.example.android_adlive_master.widget.heightsensenablelayout;
 
 import android.content.Context;
-import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
+import android.widget.RelativeLayout;
 
 /**
  * Created by 亮亮 on 2018/1/15.
  */
-//高度敏感的约束布局
-public class HeightSensenableConstrantLayout extends ConstraintLayout {
+
+public class HeightSensenableRelativeLayout extends RelativeLayout {
     OnLayoutHeightChangedListenser mListener;
 
-    public HeightSensenableConstrantLayout(Context context) {
+    public HeightSensenableRelativeLayout(Context context) {
         super(context);
     }
 
-    public HeightSensenableConstrantLayout(Context context, AttributeSet attrs) {
+    public HeightSensenableRelativeLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -44,15 +44,16 @@ public class HeightSensenableConstrantLayout extends ConstraintLayout {
     }
 
     public interface OnLayoutHeightChangedListenser {
-        //回到左边是聊天，右边是关闭的页面
+        //回到左边是聊天 右边是关闭的页面
         void showNormal();
 
         //切换到聊天的底部布局
         void showChat();
+
     }
 
-    public void setOnLayoutHeightChangedListenser(OnLayoutHeightChangedListenser listenser) {
+    public void setOnLayoutHeightChangedListenser(OnLayoutHeightChangedListenser
+                                                                 listenser) {
         mListener = listenser;
-
     }
 }

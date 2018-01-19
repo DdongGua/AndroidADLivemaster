@@ -7,18 +7,20 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.example.android_adlive_master.R;
 import com.example.android_adlive_master.app.AdouApplication;
+import com.example.android_adlive_master.bean.DanmuMsgInfo;
 import com.example.android_adlive_master.bean.TextMsgInfo;
 import com.example.android_adlive_master.engine.MessageObservable;
+import com.example.android_adlive_master.engine.live.Constants;
 import com.example.android_adlive_master.timcustom.CustomTimConstant;
 import com.example.android_adlive_master.utils.ToastUtils;
-import com.example.android_adlive_master.widget.BottomChatSwitchLayout;
-import com.example.android_adlive_master.widget.BottomSwitchLayout;
-import com.example.android_adlive_master.widget.HeightSensenableConstrantLayout;
-import com.example.android_adlive_master.widget.LiveMsgListView;
+import com.example.android_adlive_master.widget.chat.BottomChatSwitchLayout;
+import com.example.android_adlive_master.widget.chat.BottomSwitchLayout;
+import com.example.android_adlive_master.widget.danmu.DanmuView;
+import com.example.android_adlive_master.widget.heightsensenablelayout.HeightSensenableRelativeLayout;
+import com.example.android_adlive_master.widget.listview.LiveMsgListView;
 import com.tencent.TIMFriendshipManager;
 import com.tencent.TIMMessage;
 import com.tencent.TIMUserProfile;
@@ -45,10 +47,12 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
     private BottomSwitchLayout bottomswitchlayout;
     private BottomChatSwitchLayout chatswitchlayout;
     private LiveMsgListView lmlv;
-    private HeightSensenableConstrantLayout heightscl;
+    private HeightSensenableRelativeLayout heightscl;
     private String sendserId;//接受到的信息发送者id
     //创建集合专门存储消息
-    private ArrayList<TextMsgInfo> mList = new ArrayList<TextMsgInfo>();
+    private ArrayList<TextMsgInfo> mList = new ArrayList<>();
+    private DanmuView danmuView;
+    private TextMsgInfo textMsgInfo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,7 +91,7 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
 
     private void initListener() {
         //设置父容器的高度变化监听
-        heightscl.setOnLayoutHeightChangedListenser(new HeightSensenableConstrantLayout.OnLayoutHeightChangedListenser() {
+        heightscl.setOnLayoutHeightChangedListenser(new HeightSensenableRelativeLayout.OnLayoutHeightChangedListenser() {
             @Override
             public void showNormal() {
                 setDefultStatus();
@@ -102,20 +106,25 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
             }
         });
         //设置底部chat 聊天的监听
-        chatswitchlayout.setOnMsgListener(new BottomChatSwitchLayout.OnMsgSendListener() {
+        chatswitchlayout.setOnMsgSendListener(new BottomChatSwitchLayout.OnMsgSendListener() {
             @Override
             public void sendMsg(String text) {
                 //主播给客户发消息
                 if (TextUtils.isEmpty(sendserId)) {
                     sendserId = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier();
-
                 }
-                sendTextMsg(text, sendserId);
+                sendTextMsg(text, sendserId, CustomTimConstant.TEXT_MSG);
 
             }
 
             @Override
             public void danmu(String text) {
+                //主播给客户发消息
+                if (TextUtils.isEmpty(sendserId)) {
+                    sendserId = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier();
+                }
+                String newText = CustomTimConstant.TYPE_DAN + text;
+                sendTextMsg(newText, sendserId, CustomTimConstant.DANMU_MSG);
 
             }
         });
@@ -140,9 +149,11 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
         toolbar = findViewById(R.id.toolbar);
         avRootView = findViewById(R.id.arv_root);
         bottomswitchlayout = findViewById(R.id.bottomswitchlayout);
+        bottomswitchlayout.iv_switch_gift.setVisibility(View.INVISIBLE);
         chatswitchlayout = findViewById(R.id.chatswitchlayout);
         //初始化listview
         lmlv = findViewById(R.id.lmlv);
+        danmuView = findViewById(R.id.danmuview);
         //将avrootview添加
         ILVLiveManager.getInstance().setAvVideoView(avRootView);
     }
@@ -194,6 +205,12 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
                 finish();
 
             }
+
+            @Override
+            public void onGift() {
+
+
+            }
         });
     }
     @Override
@@ -209,7 +226,22 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
         }else {
             grade="0";
         }
-        TextMsgInfo textMsgInfo = new TextMsgInfo(Integer.parseInt(grade),nickName,msg,SenderId);
+        //判断需要发送的是否是弹幕
+        if(msg.startsWith(CustomTimConstant.TYPE_DAN)){
+            //是弹幕
+            String newMsg = msg.substring(CustomTimConstant.TYPE_DAN.length(), msg.length());
+            textMsgInfo = new TextMsgInfo(Integer.parseInt(grade), nickName, newMsg, SenderId);
+            //发送弹幕
+            String avatar = userProfile.getFaceUrl();
+            DanmuMsgInfo danmuMsgInfo = new DanmuMsgInfo();
+            danmuMsgInfo.setText(newMsg);
+            danmuMsgInfo.setGrade(Integer.parseInt(grade));
+            danmuMsgInfo.setAvatar(avatar);
+            danmuMsgInfo.setAdouID(SenderId);
+            danmuView.addDanmu(danmuMsgInfo);
+        }else {
+            textMsgInfo = new TextMsgInfo(Integer.parseInt(grade),nickName,msg,SenderId);
+        }
         lmlv.addMsg(textMsgInfo);
     }
     //自定义消息可以用作弹幕
@@ -223,7 +255,7 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
 
     }
     //腾讯云发送普通消息
-    public void sendTextMsg(final String text, String destId){
+    public void sendTextMsg(final String text, String destId, final int cmd){
         //通过对方id获取对方的等级和对方的昵称
        List<String> ids =new ArrayList<>();
        ids.add(destId);
@@ -236,12 +268,12 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
 
             @Override
             public void onSuccess(List<TIMUserProfile> timUserProfiles) {
-                 realSend(timUserProfiles,text);
+                 realSend(timUserProfiles,text,cmd);
             }
         });
     }
     //真正发送的消息
-    private void realSend(List<TIMUserProfile> timUserProfiles, final String text) {
+    private void realSend(List<TIMUserProfile> timUserProfiles, final String text,final int cmd) {
         //因为获取信息的时候 只传入了只有一个元素的集合，所以到这只能拿到一个用户的信息
         final TIMUserProfile profile = timUserProfiles.get(0);
         //发送普通消息
@@ -270,10 +302,24 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
                 if(TextUtils.isEmpty(grade)){
                     grade="0";
                 }
+                adouId = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier();
                 textMsgInfo.setGrade(Integer.parseInt(grade));
                 textMsgInfo.setText(text);
                 textMsgInfo.setNickname(TextUtils.isEmpty(nickName)?sendserId:nickName);
-                textMsgInfo.setAdouID(sendserId);
+                textMsgInfo.setAdouID(adouId);
+                //成功的时候怎么办 ，如果是弹幕的话就执行弹幕，如果不是弹幕 就不执行
+                if(cmd==CustomTimConstant.DANMU_MSG){
+                    String newMsg = text.substring(CustomTimConstant.TYPE_DAN.length(), text.length());
+                    String avatar = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getFaceUrl();
+                    DanmuMsgInfo danmuMsgInfo = new DanmuMsgInfo();
+                    danmuMsgInfo.setAdouID(adouId);
+                    danmuMsgInfo.setAvatar(avatar);
+                    danmuMsgInfo.setGrade(Integer.parseInt(grade));
+                    danmuMsgInfo.setText(newMsg);
+
+                    danmuView.addDanmu(danmuMsgInfo);
+                    textMsgInfo.setText(newMsg);
+                }
                 //更新列表
                 lmlv.addMsg(textMsgInfo);
 

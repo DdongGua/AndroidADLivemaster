@@ -17,7 +17,7 @@ import com.example.android_adlive_master.engine.PicChooseHelper;
 import com.example.android_adlive_master.qiniu.QiniuUploadHelper;
 import com.example.android_adlive_master.utils.ImageUtils;
 import com.example.android_adlive_master.utils.ToastUtils;
-import com.example.android_adlive_master.widget.EditProfileAvatarDialog;
+import com.example.android_adlive_master.widget.dialog.EditProfileAvatarDialog;
 import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.UpCompletionHandler;
 

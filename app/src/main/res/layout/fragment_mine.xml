@@ -180,7 +180,7 @@
                 android:background="@color/little_gray"
                 />
 
-            <com.example.android_adlive_master.widget.ProfileItem
+            <com.example.android_adlive_master.widget.edititem.ProfileItem
                 android:id="@+id/ep_acount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -188,14 +188,14 @@
                 app:profileitemtitle="账户"
                 />
 
-            <com.example.android_adlive_master.widget.ProfileItem
+            <com.example.android_adlive_master.widget.edititem.ProfileItem
                 android:id="@+id/ep_get"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:profilelefticon="@mipmap/get"
                 app:profileitemtitle="收益"                />
 
-            <com.example.android_adlive_master.widget.ProfileItem
+            <com.example.android_adlive_master.widget.edititem.ProfileItem
                 android:id="@+id/ep_watch_record"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -203,7 +203,7 @@
                 app:profileitemtitle="观看记录"
                 />
 
-            <com.example.android_adlive_master.widget.ProfileItem
+            <com.example.android_adlive_master.widget.edititem.ProfileItem
                 android:id="@+id/ep_grade"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

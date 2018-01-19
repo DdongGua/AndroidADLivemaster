@@ -27,7 +27,7 @@
             android:orientation="vertical"
             >
 
-            <com.example.android_adlive_master.widget.EditProfileItem
+            <com.example.android_adlive_master.widget.edititem.EditProfileItem
                 android:id="@+id/ep_avatar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,14 +35,14 @@
                 app:itemtype="avatar"
                 />
 
-            <com.example.android_adlive_master.widget.EditProfileItem
+            <com.example.android_adlive_master.widget.edititem.EditProfileItem
                 android:id="@+id/ep_nickname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemtitle="昵称"
                 />
 
-            <com.example.android_adlive_master.widget.EditProfileItem
+            <com.example.android_adlive_master.widget.edititem.EditProfileItem
                 android:id="@+id/ep_adouid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -50,14 +50,14 @@
                 app:itemtitle="阿斗号"
                 />
 
-            <com.example.android_adlive_master.widget.EditProfileItem
+            <com.example.android_adlive_master.widget.edititem.EditProfileItem
                 android:id="@+id/ep_gender"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemtitle="性别"
                 />
 
-            <com.example.android_adlive_master.widget.EditProfileItem
+            <com.example.android_adlive_master.widget.edititem.EditProfileItem
                 android:id="@+id/ep_xingzuo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -76,28 +76,28 @@
                 android:textSize="14sp"
                 />
 
-            <com.example.android_adlive_master.widget.EditProfileItem
+            <com.example.android_adlive_master.widget.edititem.EditProfileItem
                 android:id="@+id/ep_home_country"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemtitle="家乡"
                 />
 
-            <com.example.android_adlive_master.widget.EditProfileItem
+            <com.example.android_adlive_master.widget.edititem.EditProfileItem
                 android:id="@+id/ep_job"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemtitle="职业"
                 />
 
-            <com.example.android_adlive_master.widget.EditProfileItem
+            <com.example.android_adlive_master.widget.edititem.EditProfileItem
                 android:id="@+id/ep_active_area"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemtitle="活跃地带"
                 />
 
-            <com.example.android_adlive_master.widget.EditProfileItem
+            <com.example.android_adlive_master.widget.edititem.EditProfileItem
                 android:id="@+id/ep_signature"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -8,16 +8,19 @@ import android.view.View;
 
 import com.example.android_adlive_master.R;
 import com.example.android_adlive_master.app.AdouApplication;
+import com.example.android_adlive_master.bean.DanmuMsgInfo;
 import com.example.android_adlive_master.bean.TextMsgInfo;
 import com.example.android_adlive_master.engine.MessageObservable;
 import com.example.android_adlive_master.engine.live.Constants;
 import com.example.android_adlive_master.engine.live.DemoFunc;
 import com.example.android_adlive_master.timcustom.CustomTimConstant;
 import com.example.android_adlive_master.utils.ToastUtils;
-import com.example.android_adlive_master.widget.BottomChatSwitchLayout;
-import com.example.android_adlive_master.widget.BottomSwitchLayout;
-import com.example.android_adlive_master.widget.HeightSensenableRelativeLayout;
-import com.example.android_adlive_master.widget.LiveMsgListView;
+import com.example.android_adlive_master.widget.chat.BottomChatSwitchLayout;
+import com.example.android_adlive_master.widget.chat.BottomSwitchLayout;
+import com.example.android_adlive_master.widget.danmu.DanmuView;
+import com.example.android_adlive_master.widget.gift.GiftSendDialog;
+import com.example.android_adlive_master.widget.heightsensenablelayout.HeightSensenableRelativeLayout;
+import com.example.android_adlive_master.widget.listview.LiveMsgListView;
 import com.orhanobut.logger.Logger;
 import com.tencent.TIMFriendshipManager;
 import com.tencent.TIMMessage;
@@ -49,7 +52,9 @@ public class WatchLiveActivity extends Activity implements ILVLiveConfig.ILVLive
     private HeightSensenableRelativeLayout heightsrl;
     private LiveMsgListView lmlv;
     //创建集合专门存储消息
-    private ArrayList<TextMsgInfo> mList=new ArrayList<TextMsgInfo>();
+    private ArrayList<TextMsgInfo> mList=new ArrayList<>();
+    private DanmuView danmuview;
+    private TextMsgInfo textMsgInfo;
 
 
     @Override
@@ -69,84 +74,20 @@ public class WatchLiveActivity extends Activity implements ILVLiveConfig.ILVLive
         chatswitchlayout.setVisibility(View.INVISIBLE);
         bottomswitchlayout.setVisibility(View.VISIBLE);
     }
-
-    private void setListener() {
-        heightsrl.setOnLayoutHeightChangedListenser(new HeightSensenableRelativeLayout.OnLayoutHeightChangedListenser() {
-            @Override
-            public void showNormal() {
-                setDefultStatus();
-            }
-
-            @Override
-            public void showChat() {
-                chatswitchlayout.setVisibility(View.VISIBLE);
-                bottomswitchlayout.setVisibility(View.INVISIBLE);
-
-            }
-        });
-        bottomswitchlayout.setOnSwitchListener(new BottomSwitchLayout.OnSwitchListener() {
-            @Override
-            public void onChat() {
-                //聊天
-                chatswitchlayout.setVisibility(View.VISIBLE);
-                bottomswitchlayout.setVisibility(View.INVISIBLE);
-            }
-
-            @Override
-            public void onClose() {
-                finish();
-            }
-        });
-        chatswitchlayout.setOnMsgListener(new BottomChatSwitchLayout.OnMsgSendListener() {
-            @Override
-            public void sendMsg(String text) {
-                //发送消息
-                sendTextMsg(text);
-            }
-
-            @Override
-            public void danmu(String text) {
-
-            }
-        });
-
-    }
-    //腾讯云发送普通消息
-    private void sendTextMsg(final String text) {
-        //通过对方id获取对方的等级和对方的昵称
-        List<String> ids = new ArrayList<>();
-        ids.add(hostId);
-        TIMFriendshipManager.getInstance().getFriendsProfile(ids, new TIMValueCallBack<List<TIMUserProfile>>() {
-            @Override
-            public void onError(int i, String s) {
-
-            }
-
-            @Override
-            public void onSuccess(List<TIMUserProfile> timUserProfiles) {
-                realSend(timUserProfiles,text);
-            }
-        });
-    }
-
-
-
     private void getinfoAndJoinRoom() {
         Intent intent = getIntent();
-        if (intent!=null){
-            roomId = intent.getIntExtra("roomId",-1);
+        if (intent != null) {
+            roomId = intent.getIntExtra("roomId", -1);
             hostId = intent.getStringExtra("hostId");
-            joinRoom(roomId+"");
+            joinRoom(roomId + "");
         }
     }
-
-
-
     private void initView() {
         av_rootview = findViewById(R.id.av_rootview);
         bottomswitchlayout = findViewById(R.id.bottomswitchlayout);
         chatswitchlayout = findViewById(R.id.chatswitchlayout);
         heightsrl = findViewById(R.id.heightsrl);
+        danmuview = findViewById(R.id.danmuview);
         lmlv = findViewById(R.id.lmlv);
     }
 
@@ -204,8 +145,76 @@ public class WatchLiveActivity extends Activity implements ILVLiveConfig.ILVLive
                            }
                        });
     }
+
+    private void setListener() {
+        heightsrl.setOnLayoutHeightChangedListenser(new HeightSensenableRelativeLayout.OnLayoutHeightChangedListenser() {
+            @Override
+            public void showNormal() {
+                setDefultStatus();
+            }
+
+            @Override
+            public void showChat() {
+                chatswitchlayout.setVisibility(View.VISIBLE);
+                bottomswitchlayout.setVisibility(View.INVISIBLE);
+
+            }
+        });
+        bottomswitchlayout.setOnSwitchListener(new BottomSwitchLayout.OnSwitchListener() {
+            @Override
+            public void onChat() {
+                //聊天
+                chatswitchlayout.setVisibility(View.VISIBLE);
+                bottomswitchlayout.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onClose() {
+                finish();
+            }
+
+            @Override
+            public void onGift() {
+                //弹起dialog
+                GiftSendDialog giftSendDialog = new GiftSendDialog(WatchLiveActivity.this,R.style.custom_dialog);
+                giftSendDialog.show();
+            }
+        });
+        chatswitchlayout.setOnMsgSendListener(new BottomChatSwitchLayout.OnMsgSendListener() {
+            @Override
+            public void sendMsg(String text) {
+                //发送消息
+                sendTextMsg(text,CustomTimConstant.TEXT_MSG);
+            }
+
+            @Override
+            public void danmu(String text) {
+                String newText = CustomTimConstant.TYPE_DAN + text;
+                sendTextMsg(newText,CustomTimConstant.DANMU_MSG);
+
+            }
+        });
+
+    }
+    //腾讯云发送普通消息
+    public void sendTextMsg(final String text, final int cmd) {
+        //通过对方id获取对方的等级和对方的昵称
+        List<String> ids = new ArrayList<>();
+        ids.add(hostId);
+        TIMFriendshipManager.getInstance().getFriendsProfile(ids, new TIMValueCallBack<List<TIMUserProfile>>() {
+            @Override
+            public void onError(int i, String s) {
+
+            }
+
+            @Override
+            public void onSuccess(List<TIMUserProfile> timUserProfiles) {
+                realSend(timUserProfiles,text,cmd);
+            }
+        });
+    }
     //真正的发送消息
-    private void realSend(List<TIMUserProfile> timUserProfiles, final String text) {
+    private void realSend(List<TIMUserProfile> timUserProfiles, final String text, final int cmd) {
         //因为获取信息的时候 只传入了只有一个元素的集合，所以到这只能拿到一个用户的信息
         final TIMUserProfile profile = timUserProfiles.get(0);
 
@@ -228,6 +237,18 @@ public class WatchLiveActivity extends Activity implements ILVLiveConfig.ILVLive
                 textMsgInfo.setText(text);
                 textMsgInfo.setNickname(profile.getNickName());
                 //更新列表
+                if(cmd==CustomTimConstant.DANMU_MSG){
+                    String newMsg = text.substring(CustomTimConstant.TYPE_DAN.length(), text.length());
+                    String avatar = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getFaceUrl();
+                    DanmuMsgInfo danmuMsgInfo = new DanmuMsgInfo();
+                    danmuMsgInfo.setGrade(Integer.parseInt(grade));
+                    danmuMsgInfo.setAvatar(avatar);
+                    danmuMsgInfo.setAdouID(hostId);
+                    danmuMsgInfo.setText(newMsg);
+
+                    danmuview.addDanmu(danmuMsgInfo);
+                    textMsgInfo.setText(newMsg);
+                }
                 lmlv.addMsg(textMsgInfo);
 
 
@@ -244,6 +265,7 @@ public class WatchLiveActivity extends Activity implements ILVLiveConfig.ILVLive
     @Override
     public void onNewTextMsg(ILVText text, String SenderId, TIMUserProfile userProfile) {
         //当接受到普通消息的时候，展示到listview上边去
+        TextMsgInfo textMsgInfo = new TextMsgInfo();
         String msg=text.getText();
         String nickName = userProfile.getNickName();
         String grade;
@@ -253,7 +275,24 @@ public class WatchLiveActivity extends Activity implements ILVLiveConfig.ILVLive
         }else{
             grade="0";
         }
-        TextMsgInfo textMsgInfo = new TextMsgInfo(Integer.parseInt(grade), nickName, msg, SenderId);
+        textMsgInfo.setAdouID(SenderId);
+        textMsgInfo.setGrade(Integer.parseInt(grade));
+        //判断发送的是否是弹幕
+        if(msg.startsWith(CustomTimConstant.TYPE_DAN)){
+            //是弹幕
+            String newMsg = msg.substring(CustomTimConstant.TYPE_DAN.length(), msg.length());
+           textMsgInfo.setText(newMsg);
+            //发送弹幕
+            String avatar = userProfile.getFaceUrl();
+            DanmuMsgInfo danmuMsgInfo = new DanmuMsgInfo();
+            danmuMsgInfo.setText(newMsg);
+            danmuMsgInfo.setGrade(Integer.parseInt(grade));
+            danmuMsgInfo.setAdouID(SenderId);
+            danmuMsgInfo.setAvatar(avatar);
+            danmuview.addDanmu(danmuMsgInfo);
+        }else {
+            textMsgInfo.setText(msg);
+        }
         lmlv.addMsg(textMsgInfo);
     }
 

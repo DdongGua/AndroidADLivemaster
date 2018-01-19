@@ -1,4 +1,4 @@
-package com.example.android_adlive_master.widget;
+package com.example.android_adlive_master.widget.listview;
 
 import android.content.Context;
 import android.os.IBinder;

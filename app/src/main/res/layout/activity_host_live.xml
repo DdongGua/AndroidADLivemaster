@@ -1,57 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.android_adlive_master.widget.HeightSensenableConstrantLayout
-    android:id="@+id/heightscl"
+<com.example.android_adlive_master.widget.heightsensenablelayout.HeightSensenableRelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/heightscl"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
 
     <com.tencent.ilivesdk.view.AVRootView
         android:id="@+id/arv_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/transprant"
-        app:navigationIcon="@mipmap/left_arraw"
-        />
+        app:navigationIcon="@mipmap/left_arraw"/>
 
-
-    <com.example.android_adlive_master.widget.BottomSwitchLayout
+    <com.example.android_adlive_master.widget.chat.BottomSwitchLayout
         android:id="@+id/bottomswitchlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        />
 
-    <com.example.android_adlive_master.widget.BottomChatSwitchLayout
+    <com.example.android_adlive_master.widget.chat.BottomChatSwitchLayout
         android:id="@+id/chatswitchlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:layout_alignParentBottom="true"
+        />
 
-    <com.example.android_adlive_master.widget.LiveMsgListView
+    <com.example.android_adlive_master.widget.listview.LiveMsgListView
         android:id="@+id/lmlv"
         android:layout_width="200dp"
         android:layout_height="150dp"
-        android:layout_marginBottom="3dp"
-        android:layout_marginStart="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/chatswitchlayout"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:layout_above="@+id/chatswitchlayout"
+        />
 
+    <com.example.android_adlive_master.widget.danmu.DanmuView
+        android:id="@+id/danmuview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/lmlv"
+        />
 
-</com.example.android_adlive_master.widget.HeightSensenableConstrantLayout>
+</com.example.android_adlive_master.widget.heightsensenablelayout.HeightSensenableRelativeLayout>

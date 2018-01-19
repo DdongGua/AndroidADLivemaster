@@ -1,4 +1,4 @@
-package com.example.android_adlive_master.widget;
+package com.example.android_adlive_master.widget.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
