@@ -83,7 +83,7 @@ public class MainActivity extends FragmentActivity {
          }else if("mine".equals(tag)){
              mImg.setImageResource(R.drawable.selector_tab_mine);
          }else if("create".equals(tag)){
-             mImg.setImageResource(R.mipmap.live2);
+             mImg.setImageResource(R.mipmap.live_select);
          }
         return v;
     }

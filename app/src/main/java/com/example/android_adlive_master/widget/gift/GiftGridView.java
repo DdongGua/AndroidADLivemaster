@@ -22,14 +22,17 @@ import java.util.ArrayList;
  */
 
 public class GiftGridView extends GridView {
+    //用来盛装数据的集合
     ArrayList<Gift> giftLists = new ArrayList<>();
 
     private LayoutInflater inflater;
     private GiftGridAdapter giftGridAdapter;
+    SetGiftDefault msetGiftDefault;
 
-    public GiftGridView(Context context) {
+    public GiftGridView(Context context,SetGiftDefault setGiftDefault) {
         super(context);
         inflater = LayoutInflater.from(context);
+        msetGiftDefault=setGiftDefault;
         init();
     }
 
@@ -83,7 +86,22 @@ public class GiftGridView extends GridView {
                 convertView.setTag(viewHolder);
             }
             viewHolder = (ViewHolder) convertView.getTag();
-            viewHolder.bindData(giftLists.get(position));
+           final Gift gift = giftLists.get(position);
+            //设置GridView item点击事件
+            convertView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(gift.isSelected()){
+                        gift.setSelected(false);
+                    }else {
+                        //让其他礼物不选中
+                        msetGiftDefault.setOnSelected(gift);
+                    }
+
+                }
+            });
+            viewHolder.bindData(gift);
+
 
             return convertView;
         }
@@ -123,4 +141,22 @@ public class GiftGridView extends GridView {
             }
         }
     }
+    //让所有礼物不选中
+   public interface SetGiftDefault{
+        void setOnSelected(Gift gift);
+   }
+   //设置某一个礼物选中
+   public void setGiftSelected(Gift gift){
+        for(Gift e:giftLists){
+            if(e.getGiftId()==gift.getGiftId()){
+                e.setSelected(true);
+
+            }else {
+                e.setSelected(false);
+            }
+            giftGridAdapter.notifyDataSetChanged();
+       }
+
+   }
+
 }

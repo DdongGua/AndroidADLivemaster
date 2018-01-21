@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_selected="true" android:drawable="@mipmap/mine"/>
-    <item android:drawable="@mipmap/mine1"/>
+    <item android:state_selected="true" android:drawable="@mipmap/minea"/>
+    <item android:drawable="@mipmap/mineb"/>
 </selector>

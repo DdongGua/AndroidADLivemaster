@@ -39,6 +39,11 @@ public class GiftSendDialog implements View.OnClickListener {
     private Button bt_send_gift;
     private View view;
     private final Dialog dialog;
+    private GiftGridView.SetGiftDefault setGiftDefault;
+    //设置选中的礼物
+    Gift mgift;
+    private GiftGridView giftGridView0;
+    private GiftGridView giftGridView1;
 
 
     public GiftSendDialog(Activity activity) {
@@ -108,6 +113,16 @@ public class GiftSendDialog implements View.OnClickListener {
     }
 
     private void initGridView() {
+        //初始化Gridview item点击事件
+        setGiftDefault = new GiftGridView.SetGiftDefault() {
+             @Override
+             public void setOnSelected(Gift gift) {
+                 mgift=gift;
+                 giftGridView0.setGiftSelected(gift);
+                 giftGridView1.setGiftSelected(gift);
+
+             }
+         };
         //准备viewPager中的两个GrideView
         ArrayList<Gift> gift0 = new ArrayList<>();
         ArrayList<Gift> gift1 = new ArrayList<>();
@@ -117,10 +132,10 @@ public class GiftSendDialog implements View.OnClickListener {
         gift0.addAll(allGifts.subList(startIndex, endIndex));
         gift1.addAll(allGifts.subList(endIndex, allGifts.size()));
 
-        GiftGridView giftGridView0 = new GiftGridView(activity);
+        giftGridView0 = new GiftGridView(activity,setGiftDefault);
         giftGridView0.setGiftData(gift0);
 
-        GiftGridView giftGridView1 = new GiftGridView(activity);
+        giftGridView1 = new GiftGridView(activity,setGiftDefault);
         giftGridView1.setGiftData(gift1);
         //将数据添加进去git
         gridViewLists.add(giftGridView0);
