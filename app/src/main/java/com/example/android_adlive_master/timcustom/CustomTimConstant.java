@@ -13,6 +13,9 @@ public interface CustomTimConstant {
         //校验是普通信息还是弹幕
         String TYPE_MSG="M-+s=+-G";
         String TYPE_DAN="D-+a=+-N";
+        String TYPE_GIFT_REPEAT="G-+if=+-T-repeat";
+        String TYPE_GIFT_FULL="G-+if=+-T-full";
+        String TYPE_HEART="H-+ear=+-T";
         //前缀必须是这个
         String PREFIX="Tag_Profile_Custom_";
         String INFO_SEND = PREFIX+"send";
@@ -37,4 +40,8 @@ public interface CustomTimConstant {
 
         int TEXT_MSG = 0x801;
         int DANMU_MSG=0x802;
+        int GIFT_MSG_REPEAT =0x803;
+        int GIFT_MSG_FULL_SCREEN =0x804;
+        int HEART_MSG =0x805;
+
 }

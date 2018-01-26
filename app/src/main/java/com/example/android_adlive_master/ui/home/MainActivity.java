@@ -23,7 +23,6 @@ public class MainActivity extends FragmentActivity {
 
     private FragmentManager fragmentManager;
     private Toolbar toolbar;
-//    private FrameLayout tabcontext;
     private FragmentTabHost tabHost;
 
     @Override

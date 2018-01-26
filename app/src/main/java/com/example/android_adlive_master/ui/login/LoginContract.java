@@ -20,6 +20,7 @@ public interface LoginContract {
     }
 
     interface Presenter {
+        //登录
         void login(String account, String pass);
 
     }

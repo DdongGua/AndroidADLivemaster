@@ -29,10 +29,10 @@ public class GiftGridView extends GridView {
     private GiftGridAdapter giftGridAdapter;
     SetGiftDefault msetGiftDefault;
 
-    public GiftGridView(Context context,SetGiftDefault setGiftDefault) {
+    public GiftGridView(Context context, SetGiftDefault setGiftDefault) {
         super(context);
         inflater = LayoutInflater.from(context);
-        msetGiftDefault=setGiftDefault;
+        msetGiftDefault = setGiftDefault;
         init();
     }
 
@@ -48,6 +48,7 @@ public class GiftGridView extends GridView {
         setAdapter(giftGridAdapter);
 
     }
+
     //提供方法传入礼物数据
     public void setGiftData(ArrayList<Gift> gifts) {
         //先释放一下资源
@@ -86,16 +87,20 @@ public class GiftGridView extends GridView {
                 convertView.setTag(viewHolder);
             }
             viewHolder = (ViewHolder) convertView.getTag();
-           final Gift gift = giftLists.get(position);
+            final Gift gift = giftLists.get(position);
             //设置GridView item点击事件
             convertView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(gift.isSelected()){
+                    if (gift.isSelected()) {
                         gift.setSelected(false);
-                    }else {
-                        //让其他礼物不选中
-                        msetGiftDefault.setOnSelected(gift);
+                        msetGiftDefault.onUnSelected(gift);
+                        //因为反选是当前gridview的事情，所以只需要在自己里面处理即可
+                        giftGridAdapter.notifyDataSetChanged();
+                    } else {
+                        //如果当前礼物没有选中，就让调用者去处理
+                        msetGiftDefault.OnSelected(gift);
+
                     }
 
                 }
@@ -141,22 +146,28 @@ public class GiftGridView extends GridView {
             }
         }
     }
-    //让所有礼物不选中
-   public interface SetGiftDefault{
-        void setOnSelected(Gift gift);
-   }
-   //设置某一个礼物选中
-   public void setGiftSelected(Gift gift){
-        for(Gift e:giftLists){
-            if(e.getGiftId()==gift.getGiftId()){
-                e.setSelected(true);
 
-            }else {
+    //让所有礼物不选中
+    public interface SetGiftDefault {
+        //当未选中礼物被选中的时候
+        void OnSelected(Gift gift);
+
+        //当选中礼物再次点击即取消选择的时候
+        void onUnSelected(Gift gift);
+    }
+
+    //设置某一个礼物选中,，这样其余礼物都置为反选
+    public void setGiftSelected(Gift gift) {
+        for (Gift e : giftLists) {
+            if (e.getGiftId() == gift.getGiftId()) {
+                e.setSelected(true);
+                //刷新数据
+            } else {
                 e.setSelected(false);
             }
             giftGridAdapter.notifyDataSetChanged();
-       }
+        }
 
-   }
+    }
 
 }

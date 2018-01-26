@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fl"
     android:layout_width="300dp"
     android:layout_height="wrap_content">
-
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/rl_gift_normal"
                     android:layout_width="200dp"
@@ -49,15 +49,15 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginLeft="120dp"
-        android:background="@mipmap/yusan"/>
+        android:background="@mipmap/xuegao"/>
 
     <TextView
         android:id="@+id/tv_gift_num"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginLeft="90dp"
-        android:text="X 20"
+        android:layout_marginLeft="95dp"
+        android:text=" X 20 "
         android:textColor="@color/orange"
         android:textSize="40sp"/>
 

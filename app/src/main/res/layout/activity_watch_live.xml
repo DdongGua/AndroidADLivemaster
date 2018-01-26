@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.example.android_adlive_master.widget.heightsensenablelayout.HeightSensenableRelativeLayout
-    android:id="@+id/heightsrl"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/heightsrl"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,12 +11,14 @@
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"/>
+
     <com.example.android_adlive_master.widget.chat.BottomSwitchLayout
-        android:layout_alignParentBottom="true"
         android:id="@+id/bottomswitchlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         />
+
     <com.example.android_adlive_master.widget.chat.BottomChatSwitchLayout
         android:id="@+id/chatswitchlayout"
         android:layout_width="match_parent"
@@ -30,11 +32,31 @@
         android:layout_height="150dp"
         android:layout_above="@id/bottomswitchlayout"
         />
+
+    <tyrantgit.widget.HeartLayout
+        android:id="@+id/heartlayout"
+        android:layout_width="150dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/bottomswitchlayout"
+        />
+
     <com.example.android_adlive_master.widget.danmu.DanmuView
         android:id="@+id/danmuview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/lmlv"
         />
+
+    <com.example.android_adlive_master.widget.gift.GiftView
+        android:id="@+id/giftview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/lmlv"/>
+
+    <com.example.android_adlive_master.widget.gift.GiftFullScreenView
+        android:id="@+id/gift_full_screen_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </com.example.android_adlive_master.widget.heightsensenablelayout.HeightSensenableRelativeLayout>

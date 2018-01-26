@@ -15,9 +15,13 @@ import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.android_adlive_master.R;
 import com.example.android_adlive_master.bean.Gift;
+import com.example.android_adlive_master.utils.ToastUtils;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 
@@ -41,14 +45,25 @@ public class GiftSendDialog implements View.OnClickListener {
     private final Dialog dialog;
     private GiftGridView.SetGiftDefault setGiftDefault;
     //设置选中的礼物
-    Gift mgift;
+    Gift selectedGift;
     private GiftGridView giftGridView0;
     private GiftGridView giftGridView1;
 
+    private ArrayList<Gift> gift0;
+    private ArrayList<Gift> gift1;
 
-    public GiftSendDialog(Activity activity) {
+    private long preClickTime;
+
+    private LinearLayout ll_cancel;
+
+
+    OnGiftSendListener giftSendListener;
+
+
+    public GiftSendDialog(Activity activity,OnGiftSendListener ongiftSendListener) {
         this.activity = activity;
         dialog = new Dialog(activity);
+        giftSendListener=ongiftSendListener;
         init();
         initListener();
     }
@@ -99,6 +114,20 @@ public class GiftSendDialog implements View.OnClickListener {
         iv_indicator0 = view.findViewById(R.id.iv_indicator0);
         iv_indicator1 = view.findViewById(R.id.iv_indicator1);
         bt_send_gift = view.findViewById(R.id.bt_send_gift);
+        bt_send_gift.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(System.currentTimeMillis()-preClickTime>50){
+                    //让调用者去处理发送按钮的点击事件
+                    if(giftSendListener!=null){
+                        giftSendListener.onSend(selectedGift);
+                    }
+                }else {
+                    ToastUtils.show("点击太快了！！！");
+                }
+                preClickTime=System.currentTimeMillis();
+            }
+        });
         //准备两个Gridview
         initGridView();
         dialog.setContentView(view);
@@ -115,28 +144,38 @@ public class GiftSendDialog implements View.OnClickListener {
     private void initGridView() {
         //初始化Gridview item点击事件
         setGiftDefault = new GiftGridView.SetGiftDefault() {
-             @Override
-             public void setOnSelected(Gift gift) {
-                 mgift=gift;
-                 giftGridView0.setGiftSelected(gift);
-                 giftGridView1.setGiftSelected(gift);
+            @Override
+            public void OnSelected(Gift gift) {
+                selectedGift = gift;
+                giftGridView0.setGiftSelected(gift);
+                giftGridView1.setGiftSelected(gift);
 
-             }
-         };
+            }
+
+            @Override
+            public void onUnSelected(Gift gift) {
+                //取消选择的时候
+                selectedGift=null;
+
+            }
+        };
         //准备viewPager中的两个GrideView
-        ArrayList<Gift> gift0 = new ArrayList<>();
-        ArrayList<Gift> gift1 = new ArrayList<>();
+        gift0 = new ArrayList<>();
+        gift1 = new ArrayList<>();
         int startIndex = 0;
         int endIndex = 8;
         //将大集分成两个集合
         gift0.addAll(allGifts.subList(startIndex, endIndex));
         gift1.addAll(allGifts.subList(endIndex, allGifts.size()));
 
-        giftGridView0 = new GiftGridView(activity,setGiftDefault);
+        giftGridView0 = new GiftGridView(activity, setGiftDefault);
+        //给第一个gridview设置适配器
         giftGridView0.setGiftData(gift0);
 
-        giftGridView1 = new GiftGridView(activity,setGiftDefault);
+        giftGridView1 = new GiftGridView(activity, setGiftDefault);
+        //给第二个gridview设置适配器
         giftGridView1.setGiftData(gift1);
+
         //将数据添加进去git
         gridViewLists.add(giftGridView0);
         gridViewLists.add(giftGridView1);
@@ -167,10 +206,11 @@ public class GiftSendDialog implements View.OnClickListener {
 
     }
 
-    public GiftSendDialog(Activity activity, int themeResId) {
+    public GiftSendDialog(Activity activity, int themeResId,OnGiftSendListener onGiftSendListener) {
         this.activity = activity;
         //把dialog实例化
         dialog = new Dialog(activity, themeResId);
+        giftSendListener=onGiftSendListener;
         init();
         initListener();
     }
@@ -220,4 +260,12 @@ public class GiftSendDialog implements View.OnClickListener {
         }
     }
 
+    //去让调用者去处理点击事件
+    public interface OnGiftSendListener {
+        void onSend(Gift selectedGift);
+    }
+    //更改dialog的button文字
+    public void setSendButtonText(String str){
+        bt_send_gift.setText(str);
+    }
 }

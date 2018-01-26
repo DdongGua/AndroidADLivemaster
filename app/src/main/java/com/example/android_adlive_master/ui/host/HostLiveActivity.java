@@ -2,7 +2,10 @@ package com.example.android_adlive_master.ui.host;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -11,6 +14,8 @@ import android.view.View;
 import com.example.android_adlive_master.R;
 import com.example.android_adlive_master.app.AdouApplication;
 import com.example.android_adlive_master.bean.DanmuMsgInfo;
+import com.example.android_adlive_master.bean.Gift;
+import com.example.android_adlive_master.bean.GiftMsgInfo;
 import com.example.android_adlive_master.bean.TextMsgInfo;
 import com.example.android_adlive_master.engine.MessageObservable;
 import com.example.android_adlive_master.engine.live.Constants;
@@ -19,6 +24,9 @@ import com.example.android_adlive_master.utils.ToastUtils;
 import com.example.android_adlive_master.widget.chat.BottomChatSwitchLayout;
 import com.example.android_adlive_master.widget.chat.BottomSwitchLayout;
 import com.example.android_adlive_master.widget.danmu.DanmuView;
+import com.example.android_adlive_master.widget.gift.GiftFullScreenView;
+import com.example.android_adlive_master.widget.gift.GiftItem;
+import com.example.android_adlive_master.widget.gift.GiftView;
 import com.example.android_adlive_master.widget.heightsensenablelayout.HeightSensenableRelativeLayout;
 import com.example.android_adlive_master.widget.listview.LiveMsgListView;
 import com.tencent.TIMFriendshipManager;
@@ -34,12 +42,22 @@ import com.tencent.livesdk.ILVText;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import tyrantgit.widget.HeartLayout;
 
 /**
  * Created by 亮亮 on 2018/1/9.
  */
 
 public class HostLiveActivity extends Activity implements HostLiveContract.View, ILVLiveConfig.ILVLiveMsgListener {
+
+    //心形定时器
+    Timer heartTimer = new Timer();
+    //产生心形颜色的随机器
+    Random heartColorRandom = new Random();
     private AVRootView avRootView;
     private HostLivePresenter presenter;
     private Toolbar toolbar;
@@ -53,6 +71,59 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
     private ArrayList<TextMsgInfo> mList = new ArrayList<>();
     private DanmuView danmuView;
     private TextMsgInfo textMsgInfo;
+
+    private static final int FIRST_GIFT_SEND_FLAG = -1;
+    public static final int REPEAT_GIFT_SEND_FLAG = 1;
+    //倒计时时间范围
+    private int repeatTimeLimit = 10;
+    long firstSendTimeMillion;
+    GiftItem availableGiftItem;
+    private GiftView giftView;
+    Handler repeatGiftTimer = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case FIRST_GIFT_SEND_FLAG:
+                    if (repeatTimeLimit > 0) {
+                        repeatTimeLimit--;//开始倒数
+                        sendEmptyMessageDelayed(FIRST_GIFT_SEND_FLAG, 80);
+                    } else {
+                        //倒计时已经数完了，可以重新再开始
+                        availableGiftItem.setIsRepeat(false);
+                        firstSendTimeMillion = 0;
+                        repeatTimeLimit = 10;
+                    }
+
+                    break;
+
+                case REPEAT_GIFT_SEND_FLAG:
+                    //停止第一个事件 的处理
+                    if (repeatTimeLimit > 0) {
+                        repeatTimeLimit--;//开始倒数
+                        sendEmptyMessageDelayed(REPEAT_GIFT_SEND_FLAG, 80);
+
+                        //用户现在可以连发
+                    } else {
+                        //倒计时已经数完了，可以重新再开始
+                        availableGiftItem.setIsRepeat(false);
+                        availableGiftItem.repeatSendWithoutAddNum();
+                        firstSendTimeMillion = 0;
+                        repeatTimeLimit = 10;
+                    }
+
+
+                    break;
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+
+
+        }
+    };
+    private GiftFullScreenView gift_full_screen_view;
+    private HeartLayout heartLayout;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,6 +141,7 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
 
         initCreateHost();
         initToolbar();
+        startHeartAnim();
     }
 
     private void setDefultStatus() {
@@ -154,6 +226,11 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
         //初始化listview
         lmlv = findViewById(R.id.lmlv);
         danmuView = findViewById(R.id.danmuview);
+        giftView = findViewById(R.id.giftview);
+        gift_full_screen_view = findViewById(R.id.gift_full_screen_view);
+        gift_full_screen_view.setVisibility(View.INVISIBLE);
+
+        heartLayout = findViewById(R.id.heartlayout);
         //将avrootview添加
         ILVLiveManager.getInstance().setAvVideoView(avRootView);
     }
@@ -177,7 +254,8 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
 //        quitRoom();
         ILVLiveManager.getInstance().onDestory();
     }
-//    public void quitRoom() {
+
+    //    public void quitRoom() {
 //        ILVLiveManager.getInstance().quitRoom(new ILiveCallBack() {
 //            @Override
 //            public void onSuccess(Object data) {
@@ -190,7 +268,7 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
 //            }
 //        });
 //    }
-    private void setBottomSwitchListener(){
+    private void setBottomSwitchListener() {
         bottomswitchlayout.setOnSwitchListener(new BottomSwitchLayout.OnSwitchListener() {
             @Override
             public void onChat() {
@@ -213,102 +291,140 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
             }
         });
     }
+
     @Override
     public void onNewTextMsg(ILVText text, String SenderId, TIMUserProfile userProfile) {
         //当接受到普通消息的时候，展示到listview上边去
-        sendserId=SenderId;
+        sendserId = SenderId;
         String msg = text.getText();
         String nickName = userProfile.getNickName();
         String grade;
+        String avatar = userProfile.getFaceUrl();
         byte[] bytes = userProfile.getCustomInfo().get(CustomTimConstant.INFO_GRADE);
-        if(bytes!=null){
+        if (bytes != null) {
             grade = new String(bytes);
-        }else {
-            grade="0";
+        } else {
+            grade = "0";
         }
         //判断需要发送的是否是弹幕
-        if(msg.startsWith(CustomTimConstant.TYPE_DAN)){
+        if (msg.startsWith(CustomTimConstant.TYPE_DAN)) {
             //是弹幕
             String newMsg = msg.substring(CustomTimConstant.TYPE_DAN.length(), msg.length());
             textMsgInfo = new TextMsgInfo(Integer.parseInt(grade), nickName, newMsg, SenderId);
             //发送弹幕
-            String avatar = userProfile.getFaceUrl();
+
             DanmuMsgInfo danmuMsgInfo = new DanmuMsgInfo();
             danmuMsgInfo.setText(newMsg);
             danmuMsgInfo.setGrade(Integer.parseInt(grade));
             danmuMsgInfo.setAvatar(avatar);
             danmuMsgInfo.setAdouID(SenderId);
             danmuView.addDanmu(danmuMsgInfo);
+        } else if (msg.startsWith(CustomTimConstant.TYPE_GIFT_REPEAT)) {
+            //让接收到的消息是动画的话
+            availableGiftItem = giftView.getAvailableGiftItem();
+            sendGift();
+            //设置礼物的信息
+            GiftMsgInfo giftMsgInfo = new GiftMsgInfo();
+            giftMsgInfo.setAvatar(avatar);
+            giftMsgInfo.setAdouID(SenderId);
+            //通过消息本体，拿到到底是哪个礼物
+            String newMsg = msg.substring(CustomTimConstant.TYPE_GIFT_REPEAT.length(), msg.length());
+            //获取消息中的礼物信息
+            String giftname = newMsg.replace("送了一个", "");
+            Gift gift = Gift.getGiftByName(giftname);
+            giftMsgInfo.setGift(gift);
+            //给连发礼物绑定数据
+            availableGiftItem.bindData(giftMsgInfo);
+
+            textMsgInfo = new TextMsgInfo(Integer.parseInt(grade), nickName, newMsg, SenderId);
+        } else if(msg.startsWith(CustomTimConstant.TYPE_GIFT_FULL)){
+            //接受到了全屏礼物
+            GiftMsgInfo giftMsgInfo = new GiftMsgInfo();
+            giftMsgInfo.setAvatar(avatar);
+            giftMsgInfo.setAdouID(SenderId);
+            gift_full_screen_view.showFullScreenGift(giftMsgInfo);
+            textMsgInfo = new TextMsgInfo(Integer.parseInt(grade), nickName, "送出了一辆保时捷超跑", SenderId);
+        }else  if(msg.startsWith(CustomTimConstant.TYPE_HEART)){
+            msg = "点亮了一颗心";
+            textMsgInfo = new TextMsgInfo(Integer.parseInt(grade), nickName, msg, SenderId);
+            addHeart();
+
         }else {
-            textMsgInfo = new TextMsgInfo(Integer.parseInt(grade),nickName,msg,SenderId);
+            textMsgInfo = new TextMsgInfo(Integer.parseInt(grade), nickName, msg, SenderId);
         }
         lmlv.addMsg(textMsgInfo);
     }
+
+
     //自定义消息可以用作弹幕
     @Override
     public void onNewCustomMsg(ILVCustomCmd cmd, String id, TIMUserProfile userProfile) {
 
     }
-    //其它的信息
+
+    //其它类型的信息
     @Override
     public void onNewOtherMsg(TIMMessage message) {
 
     }
+
     //腾讯云发送普通消息
-    public void sendTextMsg(final String text, String destId, final int cmd){
+    public void sendTextMsg(final String text, String destId, final int cmd) {
         //通过对方id获取对方的等级和对方的昵称
-       List<String> ids =new ArrayList<>();
-       ids.add(destId);
-       //通过对方的id拿到朋友的信息
+        List<String> ids = new ArrayList<>();
+        ids.add(destId);
+        //通过对方的id拿到朋友的信息
         TIMFriendshipManager.getInstance().getFriendsProfile(ids, new TIMValueCallBack<List<TIMUserProfile>>() {
             @Override
             public void onError(int i, String s) {
-                
+
             }
 
             @Override
             public void onSuccess(List<TIMUserProfile> timUserProfiles) {
-                 realSend(timUserProfiles,text,cmd);
+                realSend(timUserProfiles, text, cmd);
             }
         });
     }
+
     //真正发送的消息
-    private void realSend(List<TIMUserProfile> timUserProfiles, final String text,final int cmd) {
+    private void realSend(List<TIMUserProfile> timUserProfiles, final String text, final int cmd) {
         //因为获取信息的时候 只传入了只有一个元素的集合，所以到这只能拿到一个用户的信息
         final TIMUserProfile profile = timUserProfiles.get(0);
         //发送普通消息
         ILVLiveManager.getInstance().sendText(new ILVText(ILVText.ILVTextType.eGroupMsg, profile.getIdentifier(), text), new ILiveCallBack() {
             @Override
             public void onSuccess(Object data) {
-                String grade=null;
+                String grade = null;
                 String adouId;
                 String nickName;
                 //发送成功之后，加入到listview中
                 TextMsgInfo textMsgInfo = new TextMsgInfo();
-                if(sendserId.equals(AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier())){
-                     grade = AdouApplication.getApp().getAdouTimUserProfile().getGrade() + "";
-                     adouId=AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier();
-                     nickName = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getNickName();
+                if (sendserId.equals(AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier())) {
+                    grade = AdouApplication.getApp().getAdouTimUserProfile().getGrade() + "";
+                    adouId = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier();
+                    nickName = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getNickName();
 
 
-                }else {
+                } else {
                     byte[] bytes = profile.getCustomInfo().get(CustomTimConstant.INFO_GRADE);
-                    if(bytes!=null){
+                    if (bytes != null) {
                         grade = new String(bytes);
                     }
-                    nickName=profile.getIdentifier();
+                    nickName = profile.getNickName();
 
                 }
-                if(TextUtils.isEmpty(grade)){
-                    grade="0";
+                if (TextUtils.isEmpty(grade)) {
+                    grade = "0";
                 }
                 adouId = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier();
                 textMsgInfo.setGrade(Integer.parseInt(grade));
                 textMsgInfo.setText(text);
-                textMsgInfo.setNickname(TextUtils.isEmpty(nickName)?sendserId:nickName);
+                textMsgInfo.setNickname(TextUtils.isEmpty(nickName) ? sendserId : nickName);
                 textMsgInfo.setAdouID(adouId);
+
                 //成功的时候怎么办 ，如果是弹幕的话就执行弹幕，如果不是弹幕 就不执行
-                if(cmd==CustomTimConstant.DANMU_MSG){
+                if (cmd == CustomTimConstant.DANMU_MSG) {
                     String newMsg = text.substring(CustomTimConstant.TYPE_DAN.length(), text.length());
                     String avatar = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getFaceUrl();
                     DanmuMsgInfo danmuMsgInfo = new DanmuMsgInfo();
@@ -331,5 +447,54 @@ public class HostLiveActivity extends Activity implements HostLiveContract.View,
 
             }
         });
+    }
+
+    //考虑到连击的发送礼物
+    public void sendGift() {
+        //在第一次点的时候开始计时
+        if (firstSendTimeMillion == 0) {
+            //第一次点击不是连发，设置给giftitem
+            availableGiftItem.setIsRepeat(false);
+            //拿到第一次点的时间
+            firstSendTimeMillion = System.currentTimeMillis();
+            repeatGiftTimer.sendEmptyMessage(FIRST_GIFT_SEND_FLAG);
+            //再执行动画
+            availableGiftItem.setVisibility(View.VISIBLE);
+            availableGiftItem.startAnimate();
+        } else {//如果属于连击的话,需要把倒计时再从10开始倒数，并且增加礼物数
+            //属于连发
+            availableGiftItem.setIsRepeat(true);
+            availableGiftItem.repeatSend();//连发操作
+            //清空两个handler的处理
+            repeatGiftTimer.removeMessages(FIRST_GIFT_SEND_FLAG);
+            repeatGiftTimer.removeMessages(REPEAT_GIFT_SEND_FLAG);
+            repeatGiftTimer.sendEmptyMessage(REPEAT_GIFT_SEND_FLAG);
+            repeatTimeLimit = 10;
+        }
+    }
+    private void addHeart() {
+        //添加一一颗心
+        heartLayout.addHeart(generateColor());
+    }
+    private int generateColor() {
+        int rgb = Color.rgb(heartColorRandom.nextInt(255), heartColorRandom.nextInt(255), heartColorRandom.nextInt(255));
+        return rgb;
+    }
+    //开始心形动画,在零秒之后每隔一秒自动冒心
+    private void startHeartAnim() {
+        heartTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                heartLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        heartLayout.addHeart(generateColor());
+                    }
+                });
+
+            }
+        }, 0, 1000);
+
     }
 }
