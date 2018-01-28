@@ -324,13 +324,13 @@ public class WatchLiveActivity extends Activity implements ILVLiveConfig.ILVLive
                         //先得到选中的礼物
                         mselectedGift = selectedGift;
                         GiftMsgInfo giftMsgInfo = new GiftMsgInfo();
+                        String identifier = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier();
+                        giftMsgInfo.setAdouID(identifier);
+                        String faceUrl = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getFaceUrl();
+                        giftMsgInfo.setAvatar(faceUrl);
                         //如果选中的礼物是连续礼物
                         if (selectedGift.getType() == Gift.GiftType.Repeat) {
                             giftMsgInfo.setGift(selectedGift);
-                            String identifier = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getIdentifier();
-                            giftMsgInfo.setAdouID(identifier);
-                            String faceUrl = AdouApplication.getApp().getAdouTimUserProfile().getProfile().getFaceUrl();
-                            giftMsgInfo.setAvatar(faceUrl);
                             //做发送按钮的处理，发送自定义消息，因为观众需要给主播发消息，让主播看见
                             //消息内容
                             String text = CustomTimConstant.TYPE_GIFT_REPEAT + "送了一个" + selectedGift.getName();
